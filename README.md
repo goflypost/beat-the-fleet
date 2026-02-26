@@ -2,7 +2,7 @@
 
 > *The AI thinks it knows the fastest way. Prove it wrong. Get paid.*
 
-A product concept and interactive mockup for gamifying autonomous vehicle rides — built with the comma four in mind.
+A product concept and interactive mockup for gamifying autonomous vehicle rides — built with the comma 3X in mind.
 
 ---
 
@@ -27,14 +27,14 @@ Before your ride begins, you see two routes side by side:
 
 You choose. The ride runs. The clock doesn't lie.
 
-Beat the fleet by a minute or more and you get money off your ride. The bigger the gap, the bigger the discount.
+Beat the fleet by a minute or more and earn credit off your comma prime subscription. The bigger the gap, the bigger the cut.
 
 | Beat the fleet by | Reward |
 |---|---|
 | Under 1 min | No reward — close though |
-| 1 – 2 min | **$1.00 off** |
-| 3 – 4 min | **$2.50 off** |
-| 5+ min | **Free ride** |
+| 1 – 2 min | **10% off** next prime month |
+| 3 – 4 min | **15% off** next prime month |
+| 5+ min | **50% off** next prime month |
 
 ---
 
@@ -42,7 +42,7 @@ Beat the fleet by a minute or more and you get money off your ride. The bigger t
 
 **For riders** — you're not a passenger anymore. You have skin in the game. A four-minute ride becomes something you've been thinking about since yesterday.
 
-**For the fleet** — every ride is a labeled training sample with a real outcome attached. Shortcuts that win get absorbed into the model. Routes that lose confirm the AI was right. Either way, the model gets smarter. The cost of a $2.50 discount is nothing compared to a human-verified shortcut that improves routing for every future rider on that corridor.
+**For the fleet** — every ride is a labeled training sample with a real outcome attached. Shortcuts that win get absorbed into the model. Routes that lose confirm the AI was right. Either way, the model gets smarter. The cost of a 15% prime credit is nothing compared to a human-verified shortcut that improves routing for every future rider on that corridor.
 
 **For growth** — people will ride more. They'll recruit their friends. They'll stake their local knowledge against a machine and tell everyone about it when they win. That's word-of-mouth you can't buy.
 
