@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Beat the Fleet — comma</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #000000;
+    --surface: #0a0a0a;
+    --card: #111111;
+    --border: #1e1e1e;
+    --border-hi: #2a2a2a;
+    --red: #ff3c00;
+    --red-dim: rgba(255,60,0,0.08);
+    --red-border: rgba(255,60,0,0.28);
+    --green: #25c45e;
+    --green-dim: rgba(37,196,94,0.07);
+    --green-border: rgba(37,196,94,0.22);
+    --yellow: #e8b500;
+    --white: #ffffff;
+    --text: #c8c8c8;
+    --muted: #484848;
+    --muted2: #2e2e2e;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--black);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    -webkit-font-smoothing: antialiased;
+    letter-spacing: -0.01em;
+  }
+
+  /* ─── HEADER ─── */
+  .header {
+    width: 100%;
+    max-width: 480px;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo {
+    display: flex;
+    align-items: baseline;
+    gap: 5px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--white);
+  }
+
+  .logo .comma-mark { color: var(--red); font-size: 22px; font-weight: 700; line-height: 1; }
+  .logo .slash { color: var(--muted); font-weight: 300; font-size: 15px; margin: 0 1px; }
+  .logo .sub { font-weight: 400; font-size: 12px; color: var(--muted); }
+
+  .live-badge {
+    display: flex; align-items: center; gap: 5px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px; letter-spacing: 1.5px; color: var(--green);
+    background: var(--green-dim); border: 1px solid var(--green-border);
+    padding: 4px 9px; border-radius: 2px;
+  }
+
+  .pulse { width: 5px; height: 5px; background: var(--green); border-radius: 50%; animation: blink 1.6s ease-in-out infinite; }
+  @keyframes blink { 0%,100% { opacity:1; } 50% { opacity:0.15; } }
+
+  /* ─── TICKER ─── */
+  .ticker {
+    width: 100%; max-width: 480px;
+    overflow: hidden; border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+  .ticker-inner {
+    display: flex; gap: 40px; padding: 8px 0;
+    animation: scroll 22s linear infinite; white-space: nowrap;
+  }
+  @keyframes scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  .ticker-item { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 1px; color: var(--muted); text-transform: uppercase; }
+  .ticker-item .val { color: var(--text); }
+  .ticker-item .hi { color: var(--green); }
+
+  /* ─── HERO ─── */
+  .hero {
+    width: 100%; max-width: 480px;
+    padding: 26px 20px 22px;
+    border-bottom: 1px solid var(--border);
+  }
+  .hero-eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 2px; color: var(--red); text-transform: uppercase; margin-bottom: 10px; }
+  .hero-title { font-size: 44px; font-weight: 700; line-height: 1; letter-spacing: -2px; color: var(--white); }
+  .hero-title .dim { color: var(--muted); font-weight: 300; }
+  .hero-title .red { color: var(--red); }
+  .hero-sub { margin-top: 10px; font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+  /* ─── MAP ─── */
+  .map-container { width: 100%; max-width: 480px; padding: 14px 20px; border-bottom: 1px solid var(--border); }
+  .map-label-row { display: flex; justify-content: space-between; margin-bottom: 10px; align-items: center; }
+  .map-tag { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.5px; padding: 4px 10px; border-radius: 2px; display: flex; align-items: center; gap: 5px; }
+  .map-tag.ai-tag { background: rgba(255,255,255,0.04); border: 1px solid var(--border-hi); color: var(--muted); }
+  .map-tag.you-tag { background: var(--red-dim); border: 1px solid var(--red-border); color: var(--red); }
+  .map-tag .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .map-tag.ai-tag .dot { background: rgba(255,255,255,0.3); }
+  .map-tag.you-tag .dot { background: var(--red); box-shadow: 0 0 4px var(--red); }
+  .map-box { position: relative; width: 100%; height: 240px; background: #080c0a; border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
+  #map-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+  /* ─── ROUTE CARDS ─── */
+  .section { width:100%; max-width:480px; padding:14px 20px; border-bottom:1px solid var(--border); }
+  .eyebrow { font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:2px; color:var(--muted); text-transform:uppercase; margin-bottom:12px; }
+  .route-cards { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .route-card { background:var(--card); border:1px solid var(--border); border-radius:3px; padding:14px; cursor:pointer; transition:border-color 0.12s; position:relative; }
+  .route-card:hover { border-color:var(--border-hi); }
+  .route-card.sel-ai { border-color:rgba(255,255,255,0.18); background:rgba(255,255,255,0.015); }
+  .route-card.sel-you { border-color:var(--red-border); background:var(--red-dim); }
+  .chk { position:absolute; top:10px; right:10px; width:15px; height:15px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:8px; }
+  .chk-ai { background:rgba(255,255,255,0.08); color:var(--white); border:1px solid rgba(255,255,255,0.18); }
+  .chk-you { background:var(--red-dim); color:var(--red); border:1px solid var(--red-border); }
+  .clabel { font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:1.5px; text-transform:uppercase; margin-bottom:10px; }
+  .clabel.ai { color:var(--muted); }
+  .clabel.you { color:var(--red); }
+  .ctime { font-size:36px; font-weight:700; line-height:1; letter-spacing:-1px; color:var(--white); }
+  .ctime .u { font-size:13px; font-weight:400; color:var(--muted); letter-spacing:0; margin-left:2px; }
+  .crows { margin-top:10px; display:flex; flex-direction:column; gap:4px; }
+  .crow { display:flex; justify-content:space-between; font-size:11px; color:var(--muted); }
+  .crow span:last-child { color:var(--text); }
+  .cpill { display:inline-block; margin-top:10px; font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:1px; padding:3px 7px; border-radius:2px; }
+  .cpill.ai { background:rgba(255,255,255,0.03); color:var(--muted); border:1px solid var(--border-hi); }
+  .cpill.you { background:var(--red-dim); color:var(--red); border:1px solid var(--red-border); }
+
+  /* ─── INCENTIVE ─── */
+  .incentive-section { width:100%; max-width:480px; padding:14px 20px; border-bottom:1px solid var(--border); }
+  .incentive-banner { background:var(--red-dim); border:1px solid var(--red-border); border-radius:3px; padding:11px 14px; display:flex; align-items:center; gap:11px; margin-bottom:12px; }
+  .inc-icon { font-size:16px; flex-shrink:0; }
+  .inc-text { font-size:12px; line-height:1.55; color:var(--text); }
+  .inc-text strong { color:var(--white); font-weight:600; }
+  .tier-row { display:flex; align-items:center; justify-content:space-between; padding:8px 12px; border-radius:3px; margin-bottom:4px; border:1px solid var(--border); background:var(--card); }
+  .tier-row.hi { border-color:var(--green-border); background:var(--green-dim); }
+  .tier-by { font-family:'JetBrains Mono',monospace; font-size:8px; color:var(--muted); letter-spacing:1px; width:55px; }
+  .tier-range { font-size:12px; color:var(--text); flex:1; padding-left:10px; }
+  .tier-rew { font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:700; text-align:right; }
+  .tier-rew.none { color:var(--muted); font-weight:400; }
+  .tier-rew.g { color:var(--green); }
+  .tier-rew.y { color:var(--yellow); }
+  .tier-rew.r { color:var(--red); }
+
+  /* ─── LEADERBOARD ─── */
+  .lb-section { width:100%; max-width:480px; padding:14px 20px; border-bottom:1px solid var(--border); }
+  .lb-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
+  .lb-title { font-size:13px; font-weight:600; color:var(--white); }
+  .lb-area { font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:var(--muted); background:var(--card); border:1px solid var(--border); padding:3px 8px; border-radius:2px; }
+  .lb-row { display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+  .lb-rank { font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--muted); width:14px; text-align:center; flex-shrink:0; }
+  .lb-rank.gold { color:var(--yellow); }
+  .lb-name { font-size:12px; color:var(--text); width:70px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex-shrink:0; }
+  .lb-name.me { color:var(--white); font-weight:600; }
+  .lb-track { flex:1; height:2px; background:var(--border); border-radius:2px; overflow:hidden; }
+  .lb-fill { height:100%; border-radius:2px; }
+  .lb-score { font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--muted); width:34px; text-align:right; flex-shrink:0; }
+  .lb-score.me { color:var(--red); }
+
+  /* ─── CTA ─── */
+  .cta-section { width:100%; max-width:480px; padding:16px 20px 40px; }
+  .cta-btn { width:100%; padding:16px; background:var(--red); border:none; border-radius:3px; color:var(--white); font-family:'Inter',sans-serif; font-weight:700; font-size:14px; letter-spacing:0.5px; cursor:pointer; transition:opacity 0.12s, transform 0.1s; }
+  .cta-btn:hover { opacity:0.88; }
+  .cta-btn:active { transform:scale(0.99); opacity:0.8; }
+
+  /* ─── OVERLAY ─── */
+  .overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.93); z-index:100; align-items:center; justify-content:center; flex-direction:column; gap:14px; padding:32px 24px; }
+  .overlay.show { display:flex; animation:fadeIn 0.2s ease; }
+  @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+  .ov-label { font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:3px; color:var(--muted); text-transform:uppercase; }
+  .ov-title { font-size:54px; font-weight:700; letter-spacing:-2px; text-align:center; line-height:1; }
+  .ov-title.win { color:var(--green); }
+  .ov-title.lose { color:var(--red); }
+  .ov-stat { background:var(--card); border:1px solid var(--border); border-radius:3px; padding:16px 32px; text-align:center; width:100%; max-width:300px; }
+  .ov-stat-label { font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:2px; color:var(--muted); text-transform:uppercase; margin-bottom:8px; }
+  .ov-stat-val { font-size:40px; font-weight:700; letter-spacing:-1px; line-height:1; }
+  .ov-stat-val.pos { color:var(--green); }
+  .ov-stat-val.neg { color:var(--red); }
+
+  /* reward card */
+  .reward-card { width:100%; max-width:300px; background:var(--black); border:1px solid var(--green-border); border-radius:3px; padding:18px 20px; text-align:center; animation:pop 0.35s cubic-bezier(0.34,1.56,0.64,1) both; }
+  @keyframes pop { from { opacity:0; transform:scale(0.88); } to { opacity:1; transform:scale(1); } }
+  .r-eyebrow { font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:2px; color:var(--green); text-transform:uppercase; margin-bottom:10px; }
+  .r-amount { font-size:56px; font-weight:700; letter-spacing:-2px; color:var(--green); line-height:1; }
+  .r-unit { font-size:26px; vertical-align:super; }
+  .r-off { font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:var(--muted); margin-top:3px; }
+  .r-code { margin-top:12px; padding:8px 12px; background:rgba(37,196,94,0.04); border:1px dashed rgba(37,196,94,0.22); border-radius:2px; font-family:'JetBrains Mono',monospace; font-size:13px; letter-spacing:2px; color:var(--green); }
+  .r-expires { margin-top:5px; font-family:'JetBrains Mono',monospace; font-size:8px; color:var(--muted); }
+  .r-next { margin-top:10px; font-size:11px; color:var(--muted); }
+  .r-next strong { color:var(--text); }
+
+  .ov-note { font-size:12px; color:var(--muted); text-align:center; line-height:1.7; max-width:270px; }
+  .ov-note strong { color:var(--text); }
+  .back-btn { background:none; border:1px solid var(--border); color:var(--muted); font-family:'Inter',sans-serif; font-size:12px; padding:9px 22px; border-radius:2px; cursor:pointer; transition:border-color 0.12s, color 0.12s; margin-top:4px; }
+  .back-btn:hover { border-color:var(--border-hi); color:var(--text); }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="logo">
+    <span class="comma-mark">,</span>comma
+    <span class="slash">/</span>
+    <span class="sub">beat the fleet</span>
+  </div>
+  <div class="live-badge"><div class="pulse"></div>LIVE</div>
+</div>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-inner">
+    <span class="ticker-item">ROUTES LEARNED &nbsp;<span class="val">1.24M</span></span>
+    <span class="ticker-item">GLOBAL WINS &nbsp;<span class="hi">48,291</span></span>
+    <span class="ticker-item">TODAY'S TOP CUT &nbsp;<span class="hi">MLK Jr Way</span></span>
+    <span class="ticker-item">AVG ADVANTAGE &nbsp;<span class="val">+2.4 min</span></span>
+    <span class="ticker-item">FLEET WINS TODAY &nbsp;<span class="val">7,420</span></span>
+    <span class="ticker-item">ROUTES LEARNED &nbsp;<span class="val">1.24M</span></span>
+    <span class="ticker-item">GLOBAL WINS &nbsp;<span class="hi">48,291</span></span>
+    <span class="ticker-item">TODAY'S TOP CUT &nbsp;<span class="hi">MLK Jr Way</span></span>
+    <span class="ticker-item">AVG ADVANTAGE &nbsp;<span class="val">+2.4 min</span></span>
+    <span class="ticker-item">FLEET WINS TODAY &nbsp;<span class="val">7,420</span></span>
+  </div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eyebrow">// challenge active</div>
+  <div class="hero-title">
+    Beat<span class="dim"> the</span><br><span class="red">Fleet.</span>
+  </div>
+  <div class="hero-sub">Pick your route. Race the AI. Feed the model. Win money off your ride.</div>
+</div>
+
+<!-- MAP -->
+<div class="map-container">
+  <div class="map-label-row">
+    <span class="map-tag ai-tag"><span class="dot"></span>FLEET · 14 MIN · 3.2 MI</span>
+    <span class="map-tag you-tag"><span class="dot"></span>YOUR ROUTE · 11 MIN · 3.8 MI</span>
+  </div>
+  <div class="map-box">
+    <canvas id="map-canvas"></canvas>
+  </div>
+</div>
+
+<!-- ROUTE CARDS -->
+<div class="section">
+  <div class="eyebrow">Select route</div>
+  <div class="route-cards">
+
+    <div class="route-card sel-ai" id="card-ai" onclick="pick('ai')">
+      <div class="chk chk-ai" id="chk-ai-el">✓</div>
+      <div class="clabel ai">Fleet AI</div>
+      <div class="ctime">14<span class="u">min</span></div>
+      <div class="crows">
+        <div class="crow"><span>Distance</span><span>3.2 mi</span></div>
+        <div class="crow"><span>Traffic</span><span>Low</span></div>
+        <div class="crow"><span>Lights</span><span>4</span></div>
+      </div>
+      <div class="cpill ai">OPTIMAL</div>
+    </div>
+
+    <div class="route-card" id="card-you" onclick="pick('you')">
+      <div class="chk chk-you" id="chk-you-el" style="display:none">✓</div>
+      <div class="clabel you">Your Pick</div>
+      <div class="ctime">11<span class="u">min</span></div>
+      <div class="crows">
+        <div class="crow"><span>Distance</span><span>3.8 mi</span></div>
+        <div class="crow"><span>Traffic</span><span>Lighter</span></div>
+        <div class="crow"><span>Lights</span><span>2</span></div>
+      </div>
+      <div class="cpill you">LOCAL KNOWLEDGE</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- INCENTIVE & TIERS -->
+<div class="incentive-section">
+  <div class="incentive-banner">
+    <div class="inc-icon">🏁</div>
+    <div class="inc-text">Beat the fleet by <strong>1+ min</strong> and earn money off your ride. Bigger gap, bigger reward.</div>
+  </div>
+  <div class="eyebrow" style="margin-bottom:10px">Reward tiers</div>
+  <div class="tier-row">
+    <span class="tier-by">BEAT BY</span>
+    <span class="tier-range">Under 1 min</span>
+    <span class="tier-rew none">—</span>
+  </div>
+  <div class="tier-row hi">
+    <span class="tier-by">BEAT BY</span>
+    <span class="tier-range">1 – 2 min</span>
+    <span class="tier-rew g">$1.00 off</span>
+  </div>
+  <div class="tier-row">
+    <span class="tier-by">BEAT BY</span>
+    <span class="tier-range">3 – 4 min</span>
+    <span class="tier-rew y">$2.50 off</span>
+  </div>
+  <div class="tier-row">
+    <span class="tier-by">BEAT BY</span>
+    <span class="tier-range">5+ min</span>
+    <span class="tier-rew r">FREE RIDE</span>
+  </div>
+</div>
+
+<!-- LEADERBOARD -->
+<div class="lb-section">
+  <div class="lb-head">
+    <div class="lb-title">This week · your area</div>
+    <div class="lb-area">SF BAY</div>
+  </div>
+  <div class="lb-row">
+    <div class="lb-rank gold">1</div>
+    <div class="lb-name">jess_sf</div>
+    <div class="lb-track"><div class="lb-fill" style="width:92%;background:#e8b500;opacity:0.8"></div></div>
+    <div class="lb-score">+31m</div>
+  </div>
+  <div class="lb-row">
+    <div class="lb-rank">2</div>
+    <div class="lb-name">carlos_oak</div>
+    <div class="lb-track"><div class="lb-fill" style="width:70%;background:#444"></div></div>
+    <div class="lb-score">+25m</div>
+  </div>
+  <div class="lb-row">
+    <div class="lb-rank">3</div>
+    <div class="lb-name me">you</div>
+    <div class="lb-track"><div class="lb-fill" style="width:38%;background:#ff3c00;opacity:0.65"></div></div>
+    <div class="lb-score me">+13m</div>
+  </div>
+  <div class="lb-row">
+    <div class="lb-rank">4</div>
+    <div class="lb-name">mk_rider</div>
+    <div class="lb-track"><div class="lb-fill" style="width:20%;background:#2a2a2a"></div></div>
+    <div class="lb-score">+7m</div>
+  </div>
+</div>
+
+<!-- CTA -->
+<div class="cta-section">
+  <button class="cta-btn" onclick="go()">Lock in route & start</button>
+</div>
+
+<!-- OVERLAY -->
+<div class="overlay" id="overlay">
+  <div class="ov-label">Result</div>
+  <div class="ov-title win" id="ov-title">You Win</div>
+
+  <div class="ov-stat">
+    <div class="ov-stat-label">Time saved vs fleet</div>
+    <div class="ov-stat-val pos" id="ov-val">3 min</div>
+  </div>
+
+  <div class="reward-card" id="reward-card">
+    <div class="r-eyebrow">Reward unlocked</div>
+    <div class="r-amount"><span class="r-unit" id="r-unit">$</span><span id="r-val">2.50</span></div>
+    <div class="r-off" id="r-off">OFF YOUR RIDE</div>
+    <div class="r-code" id="r-code">BTF-3MIN-X9K2</div>
+    <div class="r-expires">Valid this ride · auto-applied at checkout</div>
+    <div class="r-next" id="r-next">Beat by <strong>5+ min</strong> next time for a free ride</div>
+  </div>
+
+  <div class="ov-note" id="ov-note">
+    Your route has been <strong>added to the model</strong>.<br/>
+    The fleet will know this shortcut next time.
+  </div>
+  <button class="back-btn" onclick="closeOv()">← Back to map</button>
+</div>
+
+<script>
+  // ─── MAP ENGINE ───
+  const canvas = document.getElementById('map-canvas');
+  const box = canvas.parentElement;
+
+  function initMap() {
+    const dpr = window.devicePixelRatio || 1;
+    const W = box.clientWidth;
+    const H = box.clientHeight;
+    canvas.width = W * dpr;
+    canvas.height = H * dpr;
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+    const ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+    return { ctx, W, H };
+  }
+
+  // Street grid definition: {x1,y1,x2,y2,name,namePos,wide}
+  function getStreets(W, H) {
+    return [
+      // Horizontals
+      { x1:0, y1:H*0.22, x2:W, y2:H*0.22, name:'MARKET ST', np:{x:W*0.25,y:H*0.22-6}, wide:true },
+      { x1:0, y1:H*0.47, x2:W, y2:H*0.47, name:'MISSION ST', np:{x:W*0.55,y:H*0.47-6}, wide:true },
+      { x1:0, y1:H*0.72, x2:W, y2:H*0.72, name:'CESAR CHAVEZ', np:{x:W*0.2,y:H*0.72-6}, wide:false },
+      { x1:W*0.15,y1:H*0.33, x2:W*0.85,y2:H*0.33, name:'HOWARD ST', np:{x:W*0.62,y:H*0.33-6}, wide:false },
+      { x1:W*0.1,y1:H*0.60, x2:W*0.9,y2:H*0.60, name:'FOLSOM ST', np:{x:W*0.35,y:H*0.60-6}, wide:false },
+      { x1:W*0.05,y1:H*0.86, x2:W*0.95,y2:H*0.86, name:'', np:{x:0,y:0}, wide:false },
+      // Verticals
+      { x1:W*0.12, y1:0, x2:W*0.12, y2:H, name:'VAN NESS', np:{x:W*0.12+4,y:H*0.35}, wide:true, vert:true },
+      { x1:W*0.32, y1:0, x2:W*0.32, y2:H, name:'GOUGH', np:{x:W*0.32+4,y:H*0.8}, wide:false, vert:true },
+      { x1:W*0.52, y1:0, x2:W*0.52, y2:H, name:'OCTAVIA', np:{x:W*0.52+4,y:H*0.15}, wide:false, vert:true },
+      { x1:W*0.70, y1:0, x2:W*0.70, y2:H, name:'LAGUNA', np:{x:W*0.70+4,y:H*0.6}, wide:false, vert:true },
+      { x1:W*0.87, y1:H*0.1, x2:W*0.87, y2:H, name:'BUCHANAN', np:{x:W*0.87+4,y:H*0.25}, wide:false, vert:true },
+    ];
+  }
+
+  // Fleet route: straight path along Mission St then down Van Ness
+  function getFleetRoute(W, H) {
+    return [
+      {x: W*0.12, y: H*0.47},
+      {x: W*0.87, y: H*0.47},
+      {x: W*0.87, y: H*0.22},
+    ];
+  }
+
+  // Your route: local shortcut through side streets
+  function getYourRoute(W, H) {
+    return [
+      {x: W*0.12, y: H*0.47},
+      {x: W*0.12, y: H*0.72},
+      {x: W*0.52, y: H*0.72},
+      {x: W*0.52, y: H*0.33},
+      {x: W*0.70, y: H*0.33},
+      {x: W*0.70, y: H*0.22},
+      {x: W*0.87, y: H*0.22},
+    ];
+  }
+
+  function drawStreets(ctx, W, H, streets) {
+    streets.forEach(s => {
+      // Road casing (dark border)
+      ctx.beginPath();
+      ctx.moveTo(s.x1, s.y1); ctx.lineTo(s.x2, s.y2);
+      ctx.strokeStyle = '#0d0d0d';
+      ctx.lineWidth = s.wide ? 18 : 11;
+      ctx.lineCap = 'round';
+      ctx.stroke();
+      // Road surface
+      ctx.beginPath();
+      ctx.moveTo(s.x1, s.y1); ctx.lineTo(s.x2, s.y2);
+      ctx.strokeStyle = s.wide ? '#1c2018' : '#161a13';
+      ctx.lineWidth = s.wide ? 14 : 8;
+      ctx.stroke();
+      // Center line dash (wide roads only)
+      if (s.wide) {
+        ctx.beginPath();
+        ctx.moveTo(s.x1, s.y1); ctx.lineTo(s.x2, s.y2);
+        ctx.strokeStyle = 'rgba(255,220,50,0.12)';
+        ctx.lineWidth = 1;
+        ctx.setLineDash([8, 12]);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+    });
+  }
+
+  function drawStreetNames(ctx, streets) {
+    ctx.font = '600 7px "JetBrains Mono", monospace';
+    streets.forEach(s => {
+      if (!s.name) return;
+      ctx.save();
+      if (s.vert) {
+        ctx.translate(s.np.x, s.np.y);
+        ctx.rotate(-Math.PI / 2);
+        ctx.fillStyle = 'rgba(255,255,255,0.13)';
+        ctx.fillText(s.name, 0, 0);
+      } else {
+        ctx.fillStyle = 'rgba(255,255,255,0.13)';
+        ctx.fillText(s.name, s.np.x, s.np.y);
+      }
+      ctx.restore();
+    });
+  }
+
+  function drawRoute(ctx, pts, color, glowColor, width, dashed) {
+    if (pts.length < 2) return;
+    // Glow pass
+    ctx.beginPath();
+    ctx.moveTo(pts[0].x, pts[0].y);
+    for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i].x, pts[i].y);
+    ctx.strokeStyle = glowColor;
+    ctx.lineWidth = width + 10;
+    ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    ctx.globalAlpha = 0.18;
+    if (dashed) ctx.setLineDash([10, 8]);
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+    ctx.setLineDash([]);
+
+    // Main line
+    ctx.beginPath();
+    ctx.moveTo(pts[0].x, pts[0].y);
+    for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i].x, pts[i].y);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = width;
+    if (dashed) ctx.setLineDash([10, 8]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  function drawTurnArrow(ctx, from, to, color) {
+    const dx = to.x - from.x, dy = to.y - from.y;
+    const len = Math.sqrt(dx*dx + dy*dy);
+    if (len < 1) return;
+    const nx = dx/len, ny = dy/len;
+    const mx = from.x + dx*0.5, my = from.y + dy*0.5;
+    const size = 6;
+    ctx.save();
+    ctx.translate(mx, my);
+    ctx.rotate(Math.atan2(dy, dx));
+    ctx.beginPath();
+    ctx.moveTo(size, 0);
+    ctx.lineTo(-size*0.6, -size*0.5);
+    ctx.lineTo(-size*0.6, size*0.5);
+    ctx.closePath();
+    ctx.fillStyle = color;
+    ctx.globalAlpha = 0.7;
+    ctx.fill();
+    ctx.globalAlpha = 1;
+    ctx.restore();
+  }
+
+  function drawPin(ctx, x, y, label, color) {
+    // Pin body
+    ctx.beginPath();
+    ctx.arc(x, y - 14, 8, 0, Math.PI * 2);
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    // Pin tail
+    ctx.beginPath();
+    ctx.moveTo(x - 4, y - 8);
+    ctx.lineTo(x + 4, y - 8);
+    ctx.lineTo(x, y);
+    ctx.closePath();
+    ctx.fillStyle = color;
+    ctx.fill();
+    // Label
+    ctx.font = 'bold 7px Inter, sans-serif';
+    ctx.fillStyle = '#000';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(label, x, y - 14);
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'alphabetic';
+  }
+
+  function drawCar(ctx, x, y, heading, t) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(heading);
+    // Outer glow pulse
+    const pulse = 0.5 + 0.5 * Math.sin(t * 0.003);
+    const grad = ctx.createRadialGradient(0, 0, 4, 0, 0, 18 + pulse * 6);
+    grad.addColorStop(0, 'rgba(255,60,0,0.5)');
+    grad.addColorStop(1, 'rgba(255,60,0,0)');
+    ctx.beginPath();
+    ctx.arc(0, 0, 18 + pulse * 6, 0, Math.PI * 2);
+    ctx.fillStyle = grad;
+    ctx.fill();
+    // Car body
+    ctx.beginPath();
+    ctx.arc(0, 0, 7, 0, Math.PI * 2);
+    ctx.fillStyle = '#ff3c00';
+    ctx.fill();
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    // Direction nub
+    ctx.beginPath();
+    ctx.arc(8, 0, 3, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(255,255,255,0.6)';
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function drawProgressLine(ctx, pts, progress, color) {
+    if (pts.length < 2 || progress <= 0) return;
+    // Total length
+    let segs = [];
+    let total = 0;
+    for (let i = 1; i < pts.length; i++) {
+      const dx = pts[i].x - pts[i-1].x, dy = pts[i].y - pts[i-1].y;
+      const l = Math.sqrt(dx*dx + dy*dy);
+      segs.push(l); total += l;
+    }
+    const target = total * progress;
+    let drawn = 0;
+    ctx.beginPath();
+    ctx.moveTo(pts[0].x, pts[0].y);
+    for (let i = 1; i < pts.length; i++) {
+      const rem = target - drawn;
+      if (rem <= 0) break;
+      if (rem >= segs[i-1]) {
+        ctx.lineTo(pts[i].x, pts[i].y);
+        drawn += segs[i-1];
+      } else {
+        const frac = rem / segs[i-1];
+        ctx.lineTo(pts[i-1].x + (pts[i].x - pts[i-1].x) * frac, pts[i-1].y + (pts[i].y - pts[i-1].y) * frac);
+        break;
+      }
+    }
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 3.5;
+    ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    ctx.globalAlpha = 0.55;
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+  }
+
+  function getPointAlongRoute(pts, progress) {
+    let segs = [], total = 0;
+    for (let i = 1; i < pts.length; i++) {
+      const dx = pts[i].x - pts[i-1].x, dy = pts[i].y - pts[i-1].y;
+      const l = Math.sqrt(dx*dx + dy*dy);
+      segs.push({len:l, dx, dy, from:pts[i-1]});
+      total += l;
+    }
+    let target = total * Math.max(0, Math.min(1, progress));
+    let walked = 0;
+    for (let s of segs) {
+      if (walked + s.len >= target) {
+        const t = (target - walked) / s.len;
+        return { x: s.from.x + s.dx * t, y: s.from.y + s.dy * t, angle: Math.atan2(s.dy, s.dx) };
+      }
+      walked += s.len;
+    }
+    const last = pts[pts.length-1];
+    return { x: last.x, y: last.y, angle: 0 };
+  }
+
+  // Animation loop
+  let animT = 0;
+  let rafId = null;
+
+  function startMapAnim() {
+    const { ctx, W, H } = initMap();
+    const streets = getStreets(W, H);
+    const fleetRoute = getFleetRoute(W, H);
+    const yourRoute = getYourRoute(W, H);
+    const startPt = fleetRoute[0];
+    const endPt = fleetRoute[fleetRoute.length - 1];
+
+    function frame(ts) {
+      animT = ts;
+      const progress = (ts % 6000) / 6000; // loop every 6s
+
+      ctx.clearRect(0, 0, W, H);
+
+      // Background
+      ctx.fillStyle = '#080c0a';
+      ctx.fillRect(0, 0, W, H);
+
+      // Streets
+      drawStreets(ctx, W, H, streets);
+      drawStreetNames(ctx, streets);
+
+      // Intersections (small highlights)
+      [[W*0.12,H*0.47],[W*0.12,H*0.22],[W*0.32,H*0.47],[W*0.52,H*0.47],[W*0.70,H*0.47],[W*0.87,H*0.47],
+       [W*0.52,H*0.33],[W*0.70,H*0.33],[W*0.70,H*0.22],[W*0.87,H*0.22],
+       [W*0.12,H*0.72],[W*0.52,H*0.72]].forEach(([ix,iy]) => {
+        ctx.beginPath();
+        ctx.arc(ix, iy, 3.5, 0, Math.PI*2);
+        ctx.fillStyle = '#222';
+        ctx.fill();
+      });
+
+      // Fleet route (white dashed, background)
+      drawRoute(ctx, fleetRoute, 'rgba(200,200,200,0.45)', '#ffffff', 2.5, true);
+      // Turn arrows on fleet route
+      for (let i = 1; i < fleetRoute.length; i++) drawTurnArrow(ctx, fleetRoute[i-1], fleetRoute[i], 'rgba(200,200,200,0.5)');
+
+      // Your route (red, glowing, foreground)
+      drawRoute(ctx, yourRoute, '#ff3c00', '#ff3c00', 3, false);
+      // Turn arrows on your route
+      for (let i = 1; i < yourRoute.length; i++) drawTurnArrow(ctx, yourRoute[i-1], yourRoute[i], '#ff6030');
+
+      // Traversal progress ghost (shows where fleet would be)
+      drawProgressLine(ctx, fleetRoute, progress, 'rgba(255,255,255,0.6)');
+
+      // Start pin (A)
+      drawPin(ctx, startPt.x, startPt.y, 'A', '#ffffff');
+      // End pin (B)
+      drawPin(ctx, endPt.x, endPt.y, 'B', '#25c45e');
+
+      // Animated car along YOUR route
+      const carPos = getPointAlongRoute(yourRoute, progress);
+      drawCar(ctx, carPos.x, carPos.y, carPos.angle, ts);
+
+      // Time savings badge
+      ctx.save();
+      const bx = W * 0.5, by = H * 0.88;
+      ctx.beginPath();
+      ctx.roundRect(bx - 38, by - 11, 76, 22, 3);
+      ctx.fillStyle = 'rgba(255,60,0,0.18)';
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(255,60,0,0.5)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      ctx.font = 'bold 10px "JetBrains Mono", monospace';
+      ctx.fillStyle = '#ff3c00';
+      ctx.textAlign = 'center';
+      ctx.fillText('YOU SAVE 3 MIN', bx, by + 4);
+      ctx.restore();
+
+      rafId = requestAnimationFrame(frame);
+    }
+    if (rafId) cancelAnimationFrame(rafId);
+    rafId = requestAnimationFrame(frame);
+  }
+
+  window.addEventListener('load', startMapAnim);
+  window.addEventListener('resize', () => { if (rafId) cancelAnimationFrame(rafId); startMapAnim(); });
+
+  // ─── END MAP ENGINE ───
+
+  function pick(type) {
+    sel = type;
+    document.getElementById('card-ai').className = 'route-card' + (type === 'ai' ? ' sel-ai' : '');
+    document.getElementById('card-you').className = 'route-card' + (type === 'you' ? ' sel-you' : '');
+    document.getElementById('chk-ai-el').style.display = type === 'ai' ? 'flex' : 'none';
+    document.getElementById('chk-you-el').style.display = type === 'you' ? 'flex' : 'none';
+  }
+
+  function getReward(m) {
+    if (m >= 5) return { unit:'', val:'FREE', off:'RIDE ON US', next:"That's the max. Legend." };
+    if (m >= 3) return { unit:'$', val:'2.50', off:'OFF YOUR RIDE', next:'Beat by <strong>5+ min</strong> next time for a free ride' };
+    if (m >= 1) return { unit:'$', val:'1.00', off:'OFF YOUR RIDE', next:'Beat by <strong>3+ min</strong> next time for $2.50 off' };
+    return null;
+  }
+
+  function rcode() { return 'BTF-' + Math.random().toString(36).substr(2,4).toUpperCase() + '-' + Math.random().toString(36).substr(2,4).toUpperCase(); }
+
+  function go() {
+    const ov = document.getElementById('overlay');
+    const title = document.getElementById('ov-title');
+    const val = document.getElementById('ov-val');
+    const note = document.getElementById('ov-note');
+    const card = document.getElementById('reward-card');
+
+    if (sel === 'you') {
+      const saved = 3;
+      title.textContent = 'You Win'; title.className = 'ov-title win';
+      val.textContent = saved + ' min'; val.className = 'ov-stat-val pos';
+      note.innerHTML = 'Your route has been <strong>added to the model</strong>.<br/>The fleet will know this shortcut next time.';
+      const r = getReward(saved);
+      if (r) {
+        card.style.display = 'block';
+        document.getElementById('r-unit').textContent = r.unit;
+        document.getElementById('r-val').textContent = r.val;
+        document.getElementById('r-off').textContent = r.off;
+        document.getElementById('r-code').textContent = rcode();
+        document.getElementById('r-next').innerHTML = r.next;
+      } else { card.style.display = 'none'; }
+    } else {
+      title.textContent = 'Fleet Wins'; title.className = 'ov-title lose';
+      val.textContent = '2 min'; val.className = 'ov-stat-val neg';
+      note.innerHTML = 'Fleet route confirmed optimal.<br/><strong>Your ride helped validate the model.</strong>';
+      card.style.display = 'none';
+    }
+    ov.classList.add('show');
+  }
+
+  function closeOv() { document.getElementById('overlay').classList.remove('show'); }
+</script>
+</body>
+</html>
