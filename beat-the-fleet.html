@@ -1,725 +1,1015 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Beat the Fleet — comma</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --black: #000;
-    --surface: #0a0a0a;
-    --card: #111;
-    --border: #1e1e1e;
-    --border-hi: #2a2a2a;
-    --red: #ff3c00;
-    --red-dim: rgba(255,60,0,0.08);
-    --red-border: rgba(255,60,0,0.28);
-    --green: #25c45e;
-    --green-dim: rgba(37,196,94,0.07);
-    --green-border: rgba(37,196,94,0.22);
-    --yellow: #e8b500;
-    --white: #fff;
-    --text: #c8c8c8;
-    --muted: #484848;
-  }
-  * { margin:0; padding:0; box-sizing:border-box; }
-  body { background:var(--black); color:var(--text); font-family:'Inter',sans-serif; min-height:100vh; display:flex; flex-direction:column; align-items:center; -webkit-font-smoothing:antialiased; letter-spacing:-0.01em; }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Beat the Fleet — comma</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --black: #000;
+      --surface: #0a0a0a;
+      --card: #111;
+      --border: #1e1e1e;
+      --border-hi: #2a2a2a;
+      --red: #ff3c00;
+      --red-dim: rgba(255, 60, 0, 0.08);
+      --red-border: rgba(255, 60, 0, 0.28);
+      --green: #25c45e;
+      --green-dim: rgba(37, 196, 94, 0.07);
+      --green-border: rgba(37, 196, 94, 0.22);
+      --yellow: #e8b500;
+      --white: #fff;
+      --text: #c8c8c8;
+      --muted: #484848;
+    }
 
-  .screen { width:100%; max-width:480px; display:none; flex-direction:column; min-height:100vh; }
-  .screen.active { display:flex; }
-  .mono { font-family:'JetBrains Mono',monospace; }
-  .eyebrow { font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:2px; color:var(--muted); text-transform:uppercase; }
-  .section { width:100%; padding:14px 20px; border-bottom:1px solid var(--border); }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
-  .header { width:100%; padding:15px 20px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); }
-  .logo { display:flex; align-items:baseline; gap:5px; font-size:14px; font-weight:600; color:var(--white); }
-  .logo .cm { color:var(--red); font-size:22px; font-weight:700; line-height:1; }
-  .logo .slash { color:var(--muted); font-weight:300; font-size:15px; margin:0 1px; }
-  .logo .sub { font-weight:400; font-size:12px; color:var(--muted); }
-  .live-badge { display:flex; align-items:center; gap:5px; font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1.5px; color:var(--green); background:var(--green-dim); border:1px solid var(--green-border); padding:4px 9px; border-radius:2px; }
-  .pulse { width:5px; height:5px; background:var(--green); border-radius:50%; animation:blink 1.6s ease-in-out infinite; }
-  @keyframes blink { 0%,100%{opacity:1}50%{opacity:0.15} }
+    body {
+      background: var(--black);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      -webkit-font-smoothing: antialiased;
+      letter-spacing: -0.01em;
+    }
 
-  #screen-drive .openpilot-ui {
-    position:relative; width:100%; flex:1;
-    background: linear-gradient(180deg, #0a1a0f 0%, #050d07 100%);
-    overflow:hidden; min-height:420px;
-  }
+    .screen { width: 100%; max-width: 480px; display: none; flex-direction: column; min-height: 100vh; }
+    .screen.active { display: flex; }
+    .eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; }
+    .section { width: 100%; padding: 14px 20px; border-bottom: 1px solid var(--border); }
 
-  .road {
-    position:absolute; bottom:0; left:50%; transform:translateX(-50%);
-    width:0; height:0;
-    border-left:180px solid transparent;
-    border-right:180px solid transparent;
-    border-bottom:420px solid #111;
-  }
-  .road-lines {
-    position:absolute; bottom:0; left:50%; transform:translateX(-50%);
-    width:20px; display:flex; flex-direction:column-reverse; gap:0;
-    overflow:hidden; height:420px;
-  }
-  .road-line {
-    width:6px; height:40px; background:rgba(255,220,50,0.4);
-    margin:0 auto 24px;
-    animation: roadScroll 0.6s linear infinite;
-  }
-  @keyframes roadScroll {
-    from { transform: translateY(0); }
-    to { transform: translateY(64px); }
-  }
+    .header {
+      width: 100%;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+    }
 
-  .hud {
-    position:absolute; inset:0;
-    display:flex; flex-direction:column;
-    justify-content:space-between;
-    padding:16px;
-  }
+    .logo { display: flex; align-items: baseline; gap: 5px; font-size: 14px; font-weight: 600; color: var(--white); }
+    .logo .cm { color: var(--red); font-size: 22px; font-weight: 700; line-height: 1; }
+    .logo .slash { color: var(--muted); font-weight: 300; font-size: 15px; margin: 0 1px; }
+    .logo .sub { font-weight: 400; font-size: 12px; color: var(--muted); }
 
-  .hud-top { display:flex; justify-content:space-between; align-items:flex-start; }
+    .live-badge {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 1.5px;
+      color: var(--green);
+      background: var(--green-dim);
+      border: 1px solid var(--green-border);
+      padding: 4px 9px;
+      border-radius: 2px;
+    }
 
-  .hud-speed {
-    background:rgba(0,0,0,0.6);
-    border:1px solid rgba(255,255,255,0.1);
-    border-radius:4px;
-    padding:10px 14px;
-    text-align:center;
-  }
-  .hud-speed .spd { font-size:32px; font-weight:700; color:var(--white); line-height:1; letter-spacing:-1px; }
-  .hud-speed .unit { font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--muted); letter-spacing:1px; }
+    .pulse { width: 5px; height: 5px; background: var(--green); border-radius: 50%; animation: blink 1.6s ease-in-out infinite; }
+    @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.15; } }
 
-  .hud-status {
-    background:rgba(0,0,0,0.6);
-    border:1px solid rgba(37,196,94,0.3);
-    border-radius:4px;
-    padding:8px 12px;
-    text-align:center;
-  }
-  .hud-status .op-label { font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:2px; color:var(--green); }
-  .hud-status .op-status { font-size:11px; font-weight:600; color:var(--white); margin-top:2px; }
+    #screen-drive .openpilot-ui {
+      position: relative;
+      width: 100%;
+      flex: 1;
+      background: linear-gradient(180deg, #0a1a0f 0%, #050d07 100%);
+      overflow: hidden;
+      min-height: 420px;
+    }
 
-  .steering {
-    position:absolute; bottom:80px; left:50%; transform:translateX(-50%);
-    width:60px; height:60px;
-    border:2px solid rgba(37,196,94,0.5);
-    border-radius:50%;
-    display:flex; align-items:center; justify-content:center;
-    background:rgba(0,0,0,0.5);
-  }
-  .steering::before {
-    content:'';
-    position:absolute;
-    width:40px; height:2px;
-    background:rgba(37,196,94,0.5);
-    border-radius:2px;
-  }
-  .steering::after {
-    content:'';
-    position:absolute;
-    width:2px; height:30px;
-    background:rgba(37,196,94,0.5);
-    border-radius:2px;
-  }
+    .road {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 180px solid transparent;
+      border-right: 180px solid transparent;
+      border-bottom: 420px solid #111;
+    }
 
-  .path-left, .path-right {
-    position:absolute; bottom:0;
-    width:3px; height:240px;
-    border-radius:2px;
-  }
-  .path-left { left:38%; background:linear-gradient(to top, rgba(37,196,94,0.6), transparent); transform:perspective(200px) rotateX(20deg); }
-  .path-right { right:38%; background:linear-gradient(to top, rgba(37,196,94,0.6), transparent); transform:perspective(200px) rotateX(20deg); }
+    .road-lines {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 20px;
+      display: flex;
+      flex-direction: column-reverse;
+      overflow: hidden;
+      height: 420px;
+    }
 
-  .deviation-pill {
-    position:absolute; top:16px; left:50%; transform:translateX(-50%);
-    background:rgba(255,60,0,0.15);
-    border:1px solid rgba(255,60,0,0.4);
-    border-radius:3px;
-    padding:5px 12px;
-    display:flex; align-items:center; gap:7px;
-    animation:pillFadeIn 0.4s ease both;
-    white-space:nowrap;
-  }
-  @keyframes pillFadeIn { from{opacity:0;transform:translateX(-50%) translateY(-6px)}to{opacity:1;transform:translateX(-50%) translateY(0)} }
-  .dev-dot { width:5px; height:5px; background:var(--red); border-radius:50%; animation:blink 1s ease-in-out infinite; }
-  .dev-text { font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1.5px; color:var(--red); text-transform:uppercase; }
-  .dev-timer { font-family:'JetBrains Mono',monospace; font-size:9px; color:rgba(255,60,0,0.7); letter-spacing:1px; }
+    .road-line {
+      width: 6px;
+      height: 40px;
+      background: rgba(255, 220, 50, 0.4);
+      margin: 0 auto 24px;
+      animation: roadScroll 0.6s linear infinite;
+    }
 
-  .hud-bottom {
-    display:flex; justify-content:space-between; align-items:flex-end;
-  }
-  .hud-nav {
-    background:rgba(0,0,0,0.7);
-    border:1px solid rgba(255,255,255,0.08);
-    border-radius:4px;
-    padding:8px 12px;
-    flex:1; margin-right:10px;
-  }
-  .hud-nav .street { font-size:13px; font-weight:600; color:var(--white); }
-  .hud-nav .dist { font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--muted); margin-top:2px; }
-  .hud-eta {
-    background:rgba(0,0,0,0.7);
-    border:1px solid rgba(255,255,255,0.08);
-    border-radius:4px;
-    padding:8px 12px; text-align:center;
-  }
-  .hud-eta .eta-val { font-size:18px; font-weight:700; color:var(--white); letter-spacing:-0.5px; }
-  .hud-eta .eta-label { font-family:'JetBrains Mono',monospace; font-size:8px; color:var(--muted); }
+    @keyframes roadScroll {
+      from { transform: translateY(0); }
+      to { transform: translateY(64px); }
+    }
 
-  .drive-cta {
-    padding:16px 20px 32px;
-    display:flex; flex-direction:column; gap:10px;
-  }
-  .drive-note { font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:1px; color:var(--muted); text-align:center; }
-  .btn-primary { width:100%; padding:16px; background:var(--red); border:none; border-radius:3px; color:var(--white); font-family:'Inter',sans-serif; font-weight:700; font-size:14px; letter-spacing:0.5px; cursor:pointer; transition:opacity 0.12s, transform 0.1s; }
-  .btn-primary:hover { opacity:0.88; }
-  .btn-primary:active { transform:scale(0.99); }
-  .btn-ghost { width:100%; padding:12px; background:none; border:1px solid var(--border); border-radius:3px; color:var(--muted); font-family:'Inter',sans-serif; font-size:13px; cursor:pointer; transition:border-color 0.12s, color 0.12s; }
-  .btn-ghost:hover { border-color:var(--border-hi); color:var(--text); }
+    .hud {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 16px;
+    }
 
-  #screen-reveal { background:var(--black); }
+    .hud-top { display: flex; justify-content: space-between; align-items: flex-start; }
 
-  .reveal-header { padding:20px 20px 0; }
-  .reveal-eyebrow { font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:2px; color:var(--muted); text-transform:uppercase; margin-bottom:6px; }
-  .reveal-title { font-size:32px; font-weight:700; letter-spacing:-1px; color:var(--white); line-height:1; }
-  .reveal-title .red { color:var(--red); }
-  .reveal-title .green { color:var(--green); }
+    .hud-speed {
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      padding: 10px 14px;
+      text-align: center;
+    }
 
-  .reveal-step { opacity:0; transform:translateY(12px); transition:opacity 0.5s ease, transform 0.5s ease; }
-  .reveal-step.show { opacity:1; transform:translateY(0); }
+    .hud-speed .spd { font-size: 32px; font-weight: 700; color: var(--white); line-height: 1; letter-spacing: -1px; }
+    .hud-speed .unit { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--muted); letter-spacing: 1px; }
 
-  .result-map-wrap { padding:14px 20px; }
-  .result-map { position:relative; width:100%; height:220px; background:#080c0a; border:1px solid var(--border); border-radius:4px; overflow:hidden; }
-  #result-canvas { position:absolute; inset:0; width:100%; height:100%; }
+    .hud-status {
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(37, 196, 94, 0.3);
+      border-radius: 4px;
+      padding: 8px 12px;
+      text-align: center;
+    }
 
-  .route-legend { display:flex; gap:16px; margin-top:10px; }
-  .legend-item { display:flex; align-items:center; gap:6px; font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:var(--muted); }
-  .legend-dot { width:8px; height:3px; border-radius:1px; }
-  .legend-dot.fleet { background:rgba(255,255,255,0.35); }
-  .legend-dot.you { background:var(--red); }
+    .hud-status .op-label { font-family: 'JetBrains Mono', monospace; font-size: 8px; letter-spacing: 2px; color: var(--green); }
+    .hud-status .op-status { font-size: 11px; font-weight: 600; color: var(--white); margin-top: 2px; }
 
-  .time-split { padding:0 20px 14px; }
-  .split-cards { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:12px; }
-  .split-card { background:var(--card); border:1px solid var(--border); border-radius:3px; padding:14px; }
-  .split-card.winner { border-color:var(--green-border); background:var(--green-dim); }
-  .split-label { font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:1.5px; text-transform:uppercase; margin-bottom:8px; }
-  .split-label.fleet { color:var(--muted); }
-  .split-label.you { color:var(--red); }
-  .split-time { font-size:38px; font-weight:700; letter-spacing:-1.5px; color:var(--white); line-height:1; }
-  .split-time .u { font-size:14px; font-weight:400; color:var(--muted); letter-spacing:0; margin-left:2px; }
-  .split-time.winner-time { color:var(--green); }
-  .split-sub { margin-top:6px; font-family:'JetBrains Mono',monospace; font-size:8px; color:var(--muted); }
+    .steering {
+      position: absolute;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 60px;
+      border: 2px solid rgba(37, 196, 94, 0.5);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.5);
+    }
 
-  .split-delta {
-    margin-top:12px;
-    background:var(--card); border:1px solid var(--border); border-radius:3px;
-    padding:12px 16px;
-    display:flex; align-items:center; justify-content:space-between;
-  }
-  .delta-label { font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--muted); letter-spacing:1px; }
-  .delta-val { font-size:22px; font-weight:700; letter-spacing:-0.5px; color:var(--green); }
-  .delta-val.neg { color:var(--red); }
+    .steering::before {
+      content: '';
+      position: absolute;
+      width: 40px;
+      height: 2px;
+      background: rgba(37, 196, 94, 0.5);
+      border-radius: 2px;
+    }
 
-  .reward-wrap { padding:0 20px 14px; }
-  .reward-card {
-    background:var(--black); border:1px solid var(--green-border); border-radius:3px;
-    padding:20px; text-align:center;
-    animation:none;
-  }
-  .reward-card.pop { animation:pop 0.4s cubic-bezier(0.34,1.56,0.64,1) both; }
-  @keyframes pop { from{opacity:0;transform:scale(0.88)}to{opacity:1;transform:scale(1)} }
-  .r-eyebrow { font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:2px; color:var(--green); text-transform:uppercase; margin-bottom:10px; }
-  .r-amount { font-size:64px; font-weight:700; letter-spacing:-2px; color:var(--green); line-height:1; }
-  .r-pct { font-size:36px; font-weight:700; }
-  .r-off { font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:var(--muted); margin-top:4px; }
-  .r-code { margin-top:14px; padding:9px 12px; background:rgba(37,196,94,0.04); border:1px dashed rgba(37,196,94,0.22); border-radius:2px; font-family:'JetBrains Mono',monospace; font-size:13px; letter-spacing:2px; color:var(--green); }
-  .r-expires { margin-top:5px; font-family:'JetBrains Mono',monospace; font-size:8px; color:var(--muted); }
-  .r-next { margin-top:10px; font-size:11px; color:var(--muted); line-height:1.6; }
-  .r-next strong { color:var(--text); }
+    .steering::after {
+      content: '';
+      position: absolute;
+      width: 2px;
+      height: 30px;
+      background: rgba(37, 196, 94, 0.5);
+      border-radius: 2px;
+    }
 
-  .no-reward-card {
-    background:var(--card); border:1px solid var(--border); border-radius:3px;
-    padding:20px; text-align:center;
-  }
-  .no-reward-title { font-size:18px; font-weight:600; color:var(--text); margin-bottom:6px; }
-  .no-reward-sub { font-size:12px; color:var(--muted); line-height:1.6; }
-  .no-reward-sub strong { color:var(--text); }
+    .path-left, .path-right {
+      position: absolute;
+      bottom: 0;
+      width: 3px;
+      height: 240px;
+      border-radius: 2px;
+    }
 
-  .lb-section { padding:14px 20px; border-top:1px solid var(--border); }
-  .lb-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
-  .lb-title { font-size:13px; font-weight:600; color:var(--white); }
-  .lb-badge { font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:var(--muted); background:var(--card); border:1px solid var(--border); padding:3px 8px; border-radius:2px; }
-  .lb-row { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
-  .lb-rank { font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--muted); width:16px; text-align:center; flex-shrink:0; }
-  .lb-rank.gold { color:var(--yellow); }
-  .lb-rank.silver { color:#aaa; }
-  .lb-rank.bronze { color:#cd7f32; }
-  .lb-info { flex:1; }
-  .lb-name { font-size:12px; color:var(--text); font-weight:500; }
-  .lb-name.me { color:var(--white); font-weight:600; }
-  .lb-route { font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--muted); margin-top:2px; }
-  .lb-stat { text-align:right; flex-shrink:0; }
-  .lb-time { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--green); font-weight:700; }
-  .lb-date { font-family:'JetBrains Mono',monospace; font-size:8px; color:var(--muted); margin-top:2px; }
+    .path-left { left: 38%; background: linear-gradient(to top, rgba(37, 196, 94, 0.6), transparent); transform: perspective(200px) rotateX(20deg); }
+    .path-right { right: 38%; background: linear-gradient(to top, rgba(37, 196, 94, 0.6), transparent); transform: perspective(200px) rotateX(20deg); }
 
-  .reveal-cta { padding:16px 20px 36px; }
+    .deviation-pill {
+      position: absolute;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 60, 0, 0.15);
+      border: 1px solid rgba(255, 60, 0, 0.4);
+      border-radius: 3px;
+      padding: 5px 12px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      animation: pillFadeIn 0.4s ease both;
+      white-space: nowrap;
+    }
 
-  .ticker { width:100%; max-width:480px; overflow:hidden; border-bottom:1px solid var(--border); background:var(--surface); }
-  .ticker-inner { display:flex; gap:40px; padding:8px 0; animation:scroll 22s linear infinite; white-space:nowrap; }
-  @keyframes scroll { from{transform:translateX(0)}to{transform:translateX(-50%)} }
-  .ticker-item { font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:var(--muted); text-transform:uppercase; }
-  .ticker-item .val { color:var(--text); }
-  .ticker-item .hi { color:var(--green); }
-</style>
+    @keyframes pillFadeIn {
+      from { opacity: 0; transform: translateX(-50%) translateY(-6px); }
+      to { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+
+    .dev-dot { width: 5px; height: 5px; background: var(--red); border-radius: 50%; animation: blink 1s ease-in-out infinite; }
+    .dev-text { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 1.5px; color: var(--red); text-transform: uppercase; }
+    .dev-timer { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: rgba(255, 60, 0, 0.7); letter-spacing: 1px; }
+
+    .hud-bottom { display: flex; justify-content: space-between; align-items: flex-end; }
+
+    .hud-nav {
+      background: rgba(0, 0, 0, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 4px;
+      padding: 8px 12px;
+      flex: 1;
+      margin-right: 10px;
+    }
+
+    .hud-nav .street { font-size: 13px; font-weight: 600; color: var(--white); }
+    .hud-nav .dist { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--muted); margin-top: 2px; }
+
+    .hud-eta {
+      background: rgba(0, 0, 0, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 4px;
+      padding: 8px 12px;
+      text-align: center;
+    }
+
+    .hud-eta .eta-val { font-size: 18px; font-weight: 700; color: var(--white); letter-spacing: -0.5px; }
+    .hud-eta .eta-label { font-family: 'JetBrains Mono', monospace; font-size: 8px; color: var(--muted); }
+
+    .drive-cta { padding: 16px 20px 32px; display: flex; flex-direction: column; gap: 10px; }
+    .drive-note { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 1px; color: var(--muted); text-align: center; }
+
+    .btn-primary {
+      width: 100%;
+      padding: 16px;
+      background: var(--red);
+      border: none;
+      border-radius: 3px;
+      color: var(--white);
+      font-family: 'Inter', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      transition: opacity 0.12s, transform 0.1s;
+    }
+
+    .btn-primary:hover { opacity: 0.88; }
+    .btn-primary:active { transform: scale(0.99); }
+
+    .btn-ghost {
+      width: 100%;
+      padding: 12px;
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      color: var(--muted);
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      cursor: pointer;
+      transition: border-color 0.12s, color 0.12s;
+    }
+
+    .btn-ghost:hover { border-color: var(--border-hi); color: var(--text); }
+
+    #screen-reveal { background: var(--black); }
+
+    .reveal-header { padding: 20px 20px 0; }
+    .reveal-eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin-bottom: 6px; }
+    .reveal-title { font-size: 32px; font-weight: 700; letter-spacing: -1px; color: var(--white); line-height: 1; }
+    .reveal-title .red { color: var(--red); }
+    .reveal-title .green { color: var(--green); }
+
+    .reveal-step { opacity: 0; transform: translateY(12px); transition: opacity 0.5s ease, transform 0.5s ease; }
+    .reveal-step.show { opacity: 1; transform: translateY(0); }
+
+    .result-map-wrap { padding: 14px 20px; }
+    .result-map { position: relative; width: 100%; height: 220px; background: #080c0a; border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
+    #result-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+    .route-legend { display: flex; gap: 16px; margin-top: 10px; }
+    .legend-item { display: flex; align-items: center; gap: 6px; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 1px; color: var(--muted); }
+    .legend-dot { width: 8px; height: 3px; border-radius: 1px; }
+    .legend-dot.fleet { background: rgba(255, 255, 255, 0.35); }
+    .legend-dot.you { background: var(--red); }
+
+    .time-split { padding: 0 20px 14px; }
+    .split-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+    .split-card { background: var(--card); border: 1px solid var(--border); border-radius: 3px; padding: 14px; }
+    .split-card.winner { border-color: var(--green-border); background: var(--green-dim); }
+    .split-label { font-family: 'JetBrains Mono', monospace; font-size: 8px; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 8px; }
+    .split-label.fleet { color: var(--muted); }
+    .split-label.you { color: var(--red); }
+    .split-time { font-size: 38px; font-weight: 700; letter-spacing: -1.5px; color: var(--white); line-height: 1; }
+    .split-time .u { font-size: 14px; font-weight: 400; color: var(--muted); letter-spacing: 0; margin-left: 2px; }
+    .split-time.winner-time { color: var(--green); }
+    .split-sub { margin-top: 6px; font-family: 'JetBrains Mono', monospace; font-size: 8px; color: var(--muted); }
+
+    .split-delta {
+      margin-top: 12px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .delta-label { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--muted); letter-spacing: 1px; }
+    .delta-val { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; color: var(--green); }
+    .delta-val.neg { color: var(--red); }
+
+    .reward-wrap { padding: 0 20px 14px; }
+
+    .reward-card {
+      background: var(--black);
+      border: 1px solid var(--green-border);
+      border-radius: 3px;
+      padding: 20px;
+      text-align: center;
+      animation: none;
+    }
+
+    .reward-card.pop { animation: pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+
+    @keyframes pop {
+      from { opacity: 0; transform: scale(0.88); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .r-eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 8px; letter-spacing: 2px; color: var(--green); text-transform: uppercase; margin-bottom: 10px; }
+    .r-amount { font-size: 64px; font-weight: 700; letter-spacing: -2px; color: var(--green); line-height: 1; }
+    .r-pct { font-size: 36px; font-weight: 700; }
+    .r-off { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 2px; color: var(--muted); margin-top: 4px; }
+    .r-code { margin-top: 14px; padding: 9px 12px; background: rgba(37, 196, 94, 0.04); border: 1px dashed rgba(37, 196, 94, 0.22); border-radius: 2px; font-family: 'JetBrains Mono', monospace; font-size: 13px; letter-spacing: 2px; color: var(--green); }
+    .r-expires { margin-top: 5px; font-family: 'JetBrains Mono', monospace; font-size: 8px; color: var(--muted); }
+    .r-next { margin-top: 10px; font-size: 11px; color: var(--muted); line-height: 1.6; }
+    .r-next strong { color: var(--text); }
+
+    .no-reward-card { background: var(--card); border: 1px solid var(--border); border-radius: 3px; padding: 20px; text-align: center; }
+    .no-reward-title { font-size: 18px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+    .no-reward-sub { font-size: 12px; color: var(--muted); line-height: 1.6; }
+    .no-reward-sub strong { color: var(--text); }
+
+    .lb-section { padding: 14px 20px; border-top: 1px solid var(--border); }
+    .lb-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+    .lb-title { font-size: 13px; font-weight: 600; color: var(--white); }
+    .lb-badge { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 1px; color: var(--muted); background: var(--card); border: 1px solid var(--border); padding: 3px 8px; border-radius: 2px; }
+    .lb-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .lb-rank { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--muted); width: 16px; text-align: center; flex-shrink: 0; }
+    .lb-rank.gold { color: var(--yellow); }
+    .lb-rank.silver { color: #aaa; }
+    .lb-rank.bronze { color: #cd7f32; }
+    .lb-info { flex: 1; }
+    .lb-name { font-size: 12px; color: var(--text); font-weight: 500; }
+    .lb-name.me { color: var(--white); font-weight: 600; }
+    .lb-route { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--muted); margin-top: 2px; }
+    .lb-stat { text-align: right; flex-shrink: 0; }
+    .lb-time { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--green); font-weight: 700; }
+    .lb-date { font-family: 'JetBrains Mono', monospace; font-size: 8px; color: var(--muted); margin-top: 2px; }
+
+    .reveal-cta { padding: 16px 20px 36px; }
+
+    .ticker { width: 100%; max-width: 480px; overflow: hidden; border-bottom: 1px solid var(--border); background: var(--surface); }
+    .ticker-inner { display: flex; gap: 40px; padding: 8px 0; animation: scroll 22s linear infinite; white-space: nowrap; }
+    @keyframes scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+    .ticker-item { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 1px; color: var(--muted); text-transform: uppercase; }
+    .ticker-item .val { color: var(--text); }
+    .ticker-item .hi { color: var(--green); }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+      .ticker-inner { animation: none !important; }
+    }
+  </style>
 </head>
 <body>
-
-<div id="screen-drive" class="screen active">
-  <div class="header">
-    <div class="logo"><span class="cm">,</span>comma<span class="slash">/</span><span class="sub">beat the fleet</span></div>
-    <div class="live-badge"><div class="pulse"></div>OPENPILOT</div>
-  </div>
-
-  <div class="openpilot-ui">
-    <div class="road"></div>
-    <div class="road-lines">
-      <div class="road-line"></div><div class="road-line"></div><div class="road-line"></div>
-      <div class="road-line"></div><div class="road-line"></div><div class="road-line"></div>
-      <div class="road-line"></div><div class="road-line"></div>
-    </div>
-    <div class="path-left"></div>
-    <div class="path-right"></div>
-    <div class="steering"></div>
-
-    <div class="hud">
-      <div class="hud-top">
-        <div class="hud-speed">
-          <div class="spd">34</div>
-          <div class="unit">MPH</div>
-        </div>
-
-        <div class="deviation-pill" id="dev-pill" aria-live="polite">
-          <div class="dev-dot"></div>
-          <div class="dev-text">tracking deviation</div>
-          <div class="dev-timer" id="dev-timer">00:00</div>
-        </div>
-
-        <div class="hud-status">
-          <div class="op-label">OPENPILOT</div>
-          <div class="op-status">engaged</div>
-        </div>
+  <main aria-label="Beat the Fleet demo">
+    <div id="screen-drive" class="screen active" aria-label="Drive simulation screen">
+      <div class="header">
+        <div class="logo"><span class="cm">,</span>comma<span class="slash">/</span><span class="sub">beat the fleet</span></div>
+        <div class="live-badge"><div class="pulse"></div>OPENPILOT</div>
       </div>
 
-      <div class="hud-bottom">
-        <div class="hud-nav">
-          <div class="street">↑ Folsom St · 0.3 mi</div>
-          <div class="dist">then right on 4th St</div>
+      <div class="openpilot-ui">
+        <div class="road"></div>
+        <div class="road-lines">
+          <div class="road-line"></div><div class="road-line"></div><div class="road-line"></div>
+          <div class="road-line"></div><div class="road-line"></div><div class="road-line"></div>
+          <div class="road-line"></div><div class="road-line"></div>
         </div>
-        <div class="hud-eta">
-          <div class="eta-val">8</div>
-          <div class="eta-label">MIN ETA</div>
-        </div>
-      </div>
-    </div>
-  </div>
+        <div class="path-left"></div>
+        <div class="path-right"></div>
+        <div class="steering"></div>
 
-  <div class="drive-cta">
-    <div class="drive-note">// deviation active · fleet baseline still running in background</div>
-    <button class="btn-primary" onclick="endDrive()" aria-label="End drive and see results">End drive · see results</button>
-    <button class="btn-ghost" onclick="endDriveLoss()" aria-label="Simulate fleet winning">Simulate fleet wins →</button>
-  </div>
-</div>
+        <div class="hud">
+          <div class="hud-top">
+            <div class="hud-speed">
+              <div class="spd">34</div>
+              <div class="unit">MPH</div>
+            </div>
 
-<div id="screen-reveal" class="screen">
-  <div class="header">
-    <div class="logo"><span class="cm">,</span>comma<span class="slash">/</span><span class="sub">beat the fleet</span></div>
-    <div class="live-badge" id="result-badge" style="background:var(--green-dim);border-color:var(--green-border);color:var(--green)"><div class="pulse"></div>YOU WIN</div>
-  </div>
+            <div class="deviation-pill" id="dev-pill" aria-live="polite">
+              <div class="dev-dot"></div>
+              <div class="dev-text">tracking deviation</div>
+              <div class="dev-timer" id="dev-timer">00:00</div>
+            </div>
 
-  <div class="ticker">
-    <div class="ticker-inner">
-      <span class="ticker-item">ROUTES LEARNED &nbsp;<span class="val">1.24M</span></span>
-      <span class="ticker-item">GLOBAL WINS &nbsp;<span class="hi">48,291</span></span>
-      <span class="ticker-item">TODAY'S TOP CUT &nbsp;<span class="hi">Folsom → 4th</span></span>
-      <span class="ticker-item">AVG ADVANTAGE &nbsp;<span class="val">+2.4 min</span></span>
-      <span class="ticker-item">FLEET WINS TODAY &nbsp;<span class="val">7,420</span></span>
-      <span class="ticker-item">ROUTES LEARNED &nbsp;<span class="val">1.24M</span></span>
-      <span class="ticker-item">GLOBAL WINS &nbsp;<span class="hi">48,291</span></span>
-      <span class="ticker-item">TODAY'S TOP CUT &nbsp;<span class="hi">Folsom → 4th</span></span>
-      <span class="ticker-item">AVG ADVANTAGE &nbsp;<span class="val">+2.4 min</span></span>
-      <span class="ticker-item">FLEET WINS TODAY &nbsp;<span class="val">7,420</span></span>
-    </div>
-  </div>
+            <div class="hud-status">
+              <div class="op-label">OPENPILOT</div>
+              <div class="op-status">engaged</div>
+            </div>
+          </div>
 
-  <div class="reveal-step" id="step-map">
-    <div class="reveal-header section">
-      <div class="reveal-eyebrow">Your drive vs the fleet</div>
-      <div class="reveal-title" id="reveal-title">You <span class="green">beat</span> the fleet</div>
-    </div>
-    <div class="result-map-wrap">
-      <div class="result-map">
-        <canvas id="result-canvas"></canvas>
-      </div>
-      <div class="route-legend">
-        <div class="legend-item"><div class="legend-dot fleet"></div>Fleet route</div>
-        <div class="legend-item"><div class="legend-dot you"></div>Your route</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="reveal-step" id="step-time">
-    <div class="time-split section">
-      <div class="eyebrow" style="margin-bottom:12px">Time comparison</div>
-      <div class="split-cards">
-        <div class="split-card" id="fleet-card">
-          <div class="split-label fleet">Fleet AI</div>
-          <div class="split-time" id="fleet-time">11<span class="u">min</span></div>
-          <div class="split-sub" id="fleet-sub">baseline route</div>
-        </div>
-        <div class="split-card winner" id="you-card">
-          <div class="split-label you">You</div>
-          <div class="split-time winner-time" id="your-time">8<span class="u">min</span></div>
-          <div class="split-sub" id="your-sub">via Folsom → 4th</div>
+          <div class="hud-bottom">
+            <div class="hud-nav">
+              <div class="street">↑ Folsom St · 0.3 mi</div>
+              <div class="dist">then right on 4th St</div>
+            </div>
+            <div class="hud-eta">
+              <div class="eta-val">8</div>
+              <div class="eta-label">MIN ETA</div>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="split-delta">
-        <div class="delta-label">YOUR ADVANTAGE</div>
-        <div class="delta-val" id="delta-val">−3 min</div>
-      </div>
-    </div>
-  </div>
 
-  <div class="reveal-step" id="step-reward">
-    <div class="reward-wrap section" id="reward-wrap"></div>
-  </div>
-
-  <div class="reveal-step lb-section" id="step-lb">
-    <div class="lb-head">
-      <div class="lb-title">All time local legends</div>
-      <div class="lb-badge">SF BAY</div>
-    </div>
-
-    <div class="lb-row">
-      <div class="lb-rank gold">1</div>
-      <div class="lb-info">
-        <div class="lb-name">jess_sf</div>
-        <div class="lb-route">Mission → Cesar Chavez shortcut</div>
-      </div>
-      <div class="lb-stat">
-        <div class="lb-time">+8 min</div>
-        <div class="lb-date">Jan 14</div>
+      <div class="drive-cta">
+        <div class="drive-note">// deviation active · fleet baseline still running in background</div>
+        <button id="end-drive-btn" class="btn-primary" aria-label="End drive and see results">End drive · see results</button>
+        <button id="simulate-loss-btn" class="btn-ghost" aria-label="Simulate fleet winning">Simulate fleet wins →</button>
       </div>
     </div>
 
-    <div class="lb-row">
-      <div class="lb-rank silver">2</div>
-      <div class="lb-info">
-        <div class="lb-name">carlos_oak</div>
-        <div class="lb-route">Van Ness bypass · morning</div>
+    <div id="screen-reveal" class="screen" aria-label="Results screen">
+      <div class="header">
+        <div class="logo"><span class="cm">,</span>comma<span class="slash">/</span><span class="sub">beat the fleet</span></div>
+        <div class="live-badge" id="result-badge" style="background:var(--green-dim);border-color:var(--green-border);color:var(--green)"><div class="pulse"></div>YOU WIN</div>
       </div>
-      <div class="lb-stat">
-        <div class="lb-time">+6 min</div>
-        <div class="lb-date">Feb 3</div>
+
+      <div class="ticker" aria-hidden="true">
+        <div class="ticker-inner">
+          <span class="ticker-item">ROUTES LEARNED &nbsp;<span class="val">1.24M</span></span>
+          <span class="ticker-item">GLOBAL WINS &nbsp;<span class="hi">48,291</span></span>
+          <span class="ticker-item">TODAY'S TOP CUT &nbsp;<span class="hi">Folsom → 4th</span></span>
+          <span class="ticker-item">AVG ADVANTAGE &nbsp;<span class="val">+2.4 min</span></span>
+          <span class="ticker-item">FLEET WINS TODAY &nbsp;<span class="val">7,420</span></span>
+          <span class="ticker-item">ROUTES LEARNED &nbsp;<span class="val">1.24M</span></span>
+          <span class="ticker-item">GLOBAL WINS &nbsp;<span class="hi">48,291</span></span>
+          <span class="ticker-item">TODAY'S TOP CUT &nbsp;<span class="hi">Folsom → 4th</span></span>
+          <span class="ticker-item">AVG ADVANTAGE &nbsp;<span class="val">+2.4 min</span></span>
+          <span class="ticker-item">FLEET WINS TODAY &nbsp;<span class="val">7,420</span></span>
+        </div>
+      </div>
+
+      <div class="reveal-step" id="step-map">
+        <div class="reveal-header section">
+          <div class="reveal-eyebrow">Your drive vs the fleet</div>
+          <h1 class="reveal-title" id="reveal-title">You <span class="green">beat</span> the fleet</h1>
+        </div>
+        <div class="result-map-wrap">
+          <div class="result-map">
+            <canvas id="result-canvas"></canvas>
+          </div>
+          <div class="route-legend">
+            <div class="legend-item"><div class="legend-dot fleet"></div>Fleet route</div>
+            <div class="legend-item"><div class="legend-dot you"></div>Your route</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="reveal-step" id="step-time">
+        <div class="time-split section">
+          <div class="eyebrow" style="margin-bottom:12px">Time comparison</div>
+          <div class="split-cards">
+            <div class="split-card" id="fleet-card">
+              <div class="split-label fleet">Fleet AI</div>
+              <div class="split-time" id="fleet-time">11<span class="u">min</span></div>
+              <div class="split-sub" id="fleet-sub">baseline route</div>
+            </div>
+            <div class="split-card winner" id="you-card">
+              <div class="split-label you">You</div>
+              <div class="split-time winner-time" id="your-time">8<span class="u">min</span></div>
+              <div class="split-sub" id="your-sub">via Folsom → 4th</div>
+            </div>
+          </div>
+          <div class="split-delta">
+            <div class="delta-label">YOUR ADVANTAGE</div>
+            <div class="delta-val" id="delta-val">−3 min</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="reveal-step" id="step-reward">
+        <div class="reward-wrap section" id="reward-wrap"></div>
+      </div>
+
+      <div class="reveal-step lb-section" id="step-lb">
+        <div class="lb-head">
+          <div class="lb-title">All time local legends</div>
+          <div class="lb-badge">SF BAY</div>
+        </div>
+
+        <div class="lb-row">
+          <div class="lb-rank gold">1</div>
+          <div class="lb-info">
+            <div class="lb-name">jess_sf</div>
+            <div class="lb-route">Mission → Cesar Chavez shortcut</div>
+          </div>
+          <div class="lb-stat">
+            <div class="lb-time">+8 min</div>
+            <div class="lb-date">Jan 14</div>
+          </div>
+        </div>
+
+        <div class="lb-row">
+          <div class="lb-rank silver">2</div>
+          <div class="lb-info">
+            <div class="lb-name">carlos_oak</div>
+            <div class="lb-route">Van Ness bypass · morning</div>
+          </div>
+          <div class="lb-stat">
+            <div class="lb-time">+6 min</div>
+            <div class="lb-date">Feb 3</div>
+          </div>
+        </div>
+
+        <div class="lb-row">
+          <div class="lb-rank bronze">3</div>
+          <div class="lb-info">
+            <div class="lb-name me">you · today</div>
+            <div class="lb-route">Folsom → 4th St cut</div>
+          </div>
+          <div class="lb-stat">
+            <div class="lb-time" id="lb-your-time">+3 min</div>
+            <div class="lb-date">Just now</div>
+          </div>
+        </div>
+
+        <div class="lb-row">
+          <div class="lb-rank">4</div>
+          <div class="lb-info">
+            <div class="lb-name">mk_rider</div>
+            <div class="lb-route">Market St evening run</div>
+          </div>
+          <div class="lb-stat">
+            <div class="lb-time" style="color:var(--muted)">+2 min</div>
+            <div class="lb-date">Dec 29</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="reveal-cta">
+        <button id="back-to-drive-btn" class="btn-primary" aria-label="Back to drive demo">← Back to drive demo</button>
       </div>
     </div>
+  </main>
 
-    <div class="lb-row">
-      <div class="lb-rank bronze">3</div>
-      <div class="lb-info">
-        <div class="lb-name me">you · today</div>
-        <div class="lb-route">Folsom → 4th St cut</div>
-      </div>
-      <div class="lb-stat">
-        <div class="lb-time" id="lb-your-time">+3 min</div>
-        <div class="lb-date">Just now</div>
-      </div>
-    </div>
+  <script>
+    (() => {
+      let timerInterval = null;
+      let timerSecs = 0;
+      let lastUserWon = true;
 
-    <div class="lb-row">
-      <div class="lb-rank">4</div>
-      <div class="lb-info">
-        <div class="lb-name">mk_rider</div>
-        <div class="lb-route">Market St evening run</div>
-      </div>
-      <div class="lb-stat">
-        <div class="lb-time" style="color:var(--muted)">+2 min</div>
-        <div class="lb-date">Dec 29</div>
-      </div>
-    </div>
-  </div>
+      const els = {
+        screenDrive: document.getElementById('screen-drive'),
+        screenReveal: document.getElementById('screen-reveal'),
+        devTimer: document.getElementById('dev-timer'),
+        resultBadge: document.getElementById('result-badge'),
+        revealTitle: document.getElementById('reveal-title'),
+        fleetTime: document.getElementById('fleet-time'),
+        yourTime: document.getElementById('your-time'),
+        fleetCard: document.getElementById('fleet-card'),
+        youCard: document.getElementById('you-card'),
+        deltaVal: document.getElementById('delta-val'),
+        rewardWrap: document.getElementById('reward-wrap'),
+        lbYourTime: document.getElementById('lb-your-time'),
+        resultCanvas: document.getElementById('result-canvas'),
+        stepIds: ['step-map', 'step-time', 'step-reward', 'step-lb'],
+        endDriveBtn: document.getElementById('end-drive-btn'),
+        simulateLossBtn: document.getElementById('simulate-loss-btn'),
+        backToDriveBtn: document.getElementById('back-to-drive-btn')
+      };
 
-  <div class="reveal-cta">
-    <button class="btn-primary" onclick="resetDemo()" aria-label="Back to drive demo">← Back to drive demo</button>
-  </div>
-</div>
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-<script>
-  // ─────────────────────────────────────────
-  // State
-  // ─────────────────────────────────────────
-  let timerInterval = null;
-  let timerSecs = 0;
-  let lastUserWon = true;
-
-  // ─────────────────────────────────────────
-  // Timer (counts UP from 00:00)
-  // ─────────────────────────────────────────
-  function startTimer() {
-    stopTimer();
-    timerSecs = 0;
-    const el = document.getElementById('dev-timer');
-    if (el) el.textContent = '00:00';
-    timerInterval = setInterval(() => {
-      timerSecs++;
-      const m = String(Math.floor(timerSecs / 60)).padStart(2,'0');
-      const s = String(timerSecs % 60).padStart(2,'0');
-      const tEl = document.getElementById('dev-timer');
-      if (tEl) tEl.textContent = m + ':' + s;
-    }, 1000);
-  }
-
-  function stopTimer() {
-    if (timerInterval) clearInterval(timerInterval);
-    timerInterval = null;
-  }
-
-  startTimer();
-
-  // ─────────────────────────────────────────
-  // Result map
-  // ─────────────────────────────────────────
-  function drawResultMap(userWon) {
-    const canvas = document.getElementById('result-canvas');
-    if (!canvas) return;
-
-    const box = canvas.parentElement;
-    const dpr = window.devicePixelRatio || 1;
-    const W = box.clientWidth, H = box.clientHeight;
-
-    canvas.width = W * dpr;
-    canvas.height = H * dpr;
-    canvas.style.width = W + 'px';
-    canvas.style.height = H + 'px';
-
-    const ctx = canvas.getContext('2d');
-    ctx.setTransform(1,0,0,1,0,0);
-    ctx.scale(dpr, dpr);
-
-    ctx.fillStyle = '#080c0a';
-    ctx.fillRect(0,0,W,H);
-
-    const streets = [
-      {x1:0,y1:H*0.22,x2:W,y2:H*0.22,wide:true,name:'MARKET ST',nx:W*0.25,ny:H*0.22-6},
-      {x1:0,y1:H*0.48,x2:W,y2:H*0.48,wide:true,name:'MISSION ST',nx:W*0.5,ny:H*0.48-6},
-      {x1:0,y1:H*0.72,x2:W,y2:H*0.72,wide:false,name:'FOLSOM ST',nx:W*0.2,ny:H*0.72-6},
-      {x1:W*0.12,y1:0,x2:W*0.12,y2:H,wide:true,name:'VAN NESS',vert:true,nx:W*0.12+4,ny:H*0.38},
-      {x1:W*0.35,y1:0,x2:W*0.35,y2:H,wide:false,name:'GOUGH',vert:true,nx:W*0.35+4,ny:H*0.8},
-      {x1:W*0.55,y1:0,x2:W*0.55,y2:H,wide:false,name:'OCTAVIA',vert:true,nx:W*0.55+4,ny:H*0.15},
-      {x1:W*0.75,y1:0,x2:W*0.75,y2:H,wide:false,name:'4TH ST',vert:true,nx:W*0.75+4,ny:H*0.6},
-      {x1:W*0.88,y1:H*0.1,x2:W*0.88,y2:H,wide:false,name:'',vert:true,nx:0,ny:0},
-    ];
-
-    streets.forEach(s => {
-      ctx.beginPath(); ctx.moveTo(s.x1,s.y1); ctx.lineTo(s.x2,s.y2);
-      ctx.strokeStyle='#0d0d0d'; ctx.lineWidth=s.wide?18:11; ctx.lineCap='round'; ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(s.x1,s.y1); ctx.lineTo(s.x2,s.y2);
-      ctx.strokeStyle=s.wide?'#1c2018':'#161a13'; ctx.lineWidth=s.wide?14:8; ctx.stroke();
-      if (s.wide) {
-        ctx.beginPath(); ctx.moveTo(s.x1,s.y1); ctx.lineTo(s.x2,s.y2);
-        ctx.strokeStyle='rgba(255,220,50,0.1)'; ctx.lineWidth=1; ctx.setLineDash([8,12]); ctx.stroke(); ctx.setLineDash([]);
+      function byId(id) {
+        return document.getElementById(id);
       }
-    });
 
-    ctx.font = '600 7px "JetBrains Mono",monospace';
-    streets.forEach(s => {
-      if (!s.name) return;
-      ctx.save();
-      if (s.vert) { ctx.translate(s.nx,s.ny); ctx.rotate(-Math.PI/2); }
-      ctx.fillStyle='rgba(255,255,255,0.12)';
-      ctx.fillText(s.name, s.vert?0:s.nx, s.vert?0:s.ny);
-      ctx.restore();
-    });
-
-    [
-      [W*0.12,H*0.48],[W*0.35,H*0.48],[W*0.55,H*0.48],[W*0.75,H*0.48],[W*0.88,H*0.48],
-      [W*0.12,H*0.22],[W*0.75,H*0.22],[W*0.88,H*0.22],
-      [W*0.12,H*0.72],[W*0.55,H*0.72],[W*0.75,H*0.72]
-    ].forEach(([x,y])=>{
-      ctx.beginPath(); ctx.arc(x,y,3,0,Math.PI*2); ctx.fillStyle='#1e1e1e'; ctx.fill();
-    });
-
-    const fleet = [{x:W*0.12,y:H*0.48},{x:W*0.88,y:H*0.48},{x:W*0.88,y:H*0.22}];
-    const yours = [{x:W*0.12,y:H*0.48},{x:W*0.12,y:H*0.72},{x:W*0.75,y:H*0.72},{x:W*0.75,y:H*0.22},{x:W*0.88,y:H*0.22}];
-
-    function drawRoute(pts, color, glow, w, dashed) {
-      ctx.beginPath(); ctx.moveTo(pts[0].x,pts[0].y);
-      pts.slice(1).forEach(p=>ctx.lineTo(p.x,p.y));
-      ctx.strokeStyle=glow; ctx.lineWidth=w+10; ctx.lineCap='round'; ctx.lineJoin='round';
-      ctx.globalAlpha=0.15; if(dashed) ctx.setLineDash([8,8]); ctx.stroke();
-      ctx.globalAlpha=1; ctx.setLineDash([]);
-      ctx.beginPath(); ctx.moveTo(pts[0].x,pts[0].y);
-      pts.slice(1).forEach(p=>ctx.lineTo(p.x,p.y));
-      ctx.strokeStyle=color; ctx.lineWidth=w; if(dashed) ctx.setLineDash([8,8]); ctx.stroke(); ctx.setLineDash([]);
-    }
-
-    function arrow(from,to,color) {
-      const dx=to.x-from.x,dy=to.y-from.y,l=Math.sqrt(dx*dx+dy*dy);
-      if(l<1)return;
-      const mx=from.x+dx*0.55,my=from.y+dy*0.55,s=5;
-      ctx.save(); ctx.translate(mx,my); ctx.rotate(Math.atan2(dy,dx));
-      ctx.beginPath(); ctx.moveTo(s,0); ctx.lineTo(-s*0.6,-s*0.5); ctx.lineTo(-s*0.6,s*0.5); ctx.closePath();
-      ctx.fillStyle=color; ctx.globalAlpha=0.65; ctx.fill(); ctx.globalAlpha=1; ctx.restore();
-    }
-
-    drawRoute(fleet,'rgba(200,200,200,0.4)','#fff',2.5,true);
-    fleet.slice(1).forEach((p,i)=>arrow(fleet[i],p,'rgba(200,200,200,0.5)'));
-
-    const yourColor = userWon ? '#ff3c00' : 'rgba(255,60,0,0.4)';
-    drawRoute(yours,yourColor,'#ff3c00',3,false);
-    yours.slice(1).forEach((p,i)=>arrow(yours[i],p,userWon?'#ff6030':'rgba(255,96,48,0.4)'));
-
-    function pin(x,y,label,color) {
-      ctx.beginPath(); ctx.arc(x,y-13,7,0,Math.PI*2); ctx.fillStyle=color; ctx.fill();
-      ctx.strokeStyle='#000'; ctx.lineWidth=2; ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(x-3.5,y-7); ctx.lineTo(x+3.5,y-7); ctx.lineTo(x,y); ctx.closePath();
-      ctx.fillStyle=color; ctx.fill();
-      ctx.font='bold 7px Inter,sans-serif'; ctx.fillStyle='#000';
-      ctx.textAlign='center'; ctx.textBaseline='middle';
-      ctx.fillText(label,x,y-13); ctx.textAlign='left'; ctx.textBaseline='alphabetic';
-    }
-
-    pin(W*0.12,H*0.48,'A','#fff');
-    pin(W*0.88,H*0.22,'B','#25c45e');
-
-    const bx=W*0.5,by=H*0.9;
-    ctx.beginPath();
-    if(ctx.roundRect) ctx.roundRect(bx-42,by-11,84,22,3); else ctx.rect(bx-42,by-11,84,22);
-    ctx.fillStyle=userWon?'rgba(255,60,0,0.18)':'rgba(255,255,255,0.06)';
-    ctx.fill();
-    ctx.strokeStyle=userWon?'rgba(255,60,0,0.5)':'rgba(255,255,255,0.15)';
-    ctx.lineWidth=1; ctx.stroke();
-
-    ctx.font='bold 10px "JetBrains Mono",monospace';
-    ctx.fillStyle=userWon?'#ff3c00':'#555';
-    ctx.textAlign='center';
-    ctx.fillText(userWon?'YOU BEAT THE FLEET':'FLEET WINS THIS ONE',bx,by+4);
-    ctx.textAlign='left';
-  }
-
-  // Reward tiers (unchanged behavior; just always renders something)
-  function getReward(diff) {
-    if (diff >= 5) return { pct:'50', next:"That's the max tier. Legend." };
-    if (diff >= 3) return { pct:'15', next:'Beat by <strong>5+ min</strong> next time for <strong>50% off</strong>' };
-    if (diff >= 1) return { pct:'10', next:'Beat by <strong>3+ min</strong> next time for <strong>15% off</strong>' };
-    return null;
-  }
-
-  function rcode() {
-    const a = Math.random().toString(36).slice(2,6).toUpperCase();
-    const b = Math.random().toString(36).slice(2,6).toUpperCase();
-    return `BTF-${a}-${b}`;
-  }
-
-  function runReveal(userWon, fleetMins, yourMins) {
-    lastUserWon = userWon;
-    stopTimer();
-
-    const diff = fleetMins - yourMins;
-
-    document.getElementById('screen-drive').classList.remove('active');
-    document.getElementById('screen-reveal').classList.add('active');
-
-    ['step-map','step-time','step-reward','step-lb'].forEach(id => {
-      document.getElementById(id).classList.remove('show');
-    });
-
-    const badge = document.getElementById('result-badge');
-    if (userWon) {
-      badge.style.cssText='background:var(--green-dim);border:1px solid var(--green-border);color:var(--green);display:flex;align-items:center;gap:5px;font-family:JetBrains Mono,monospace;font-size:9px;letter-spacing:1.5px;padding:4px 9px;border-radius:2px;';
-      badge.innerHTML='<div class="pulse"></div>YOU WIN';
-    } else {
-      badge.style.cssText='background:var(--red-dim);border:1px solid var(--red-border);color:var(--red);display:flex;align-items:center;gap:5px;font-family:JetBrains Mono,monospace;font-size:9px;letter-spacing:1.5px;padding:4px 9px;border-radius:2px;';
-      badge.innerHTML='<div style="width:5px;height:5px;background:var(--red);border-radius:50%;animation:blink 1.6s ease-in-out infinite"></div>FLEET WINS';
-    }
-
-    const title = document.getElementById('reveal-title');
-    title.innerHTML = userWon
-      ? 'You <span class="green">beat</span> the fleet'
-      : 'Fleet <span class="red">wins</span> this one';
-
-    // Reset any inline style leaks BEFORE applying state
-    const yourTimeEl = document.getElementById('your-time');
-    yourTimeEl.style.color = '';
-
-    document.getElementById('fleet-time').innerHTML = fleetMins+'<span class="u">min</span>';
-    yourTimeEl.innerHTML = yourMins+'<span class="u">min</span>';
-
-    if (userWon) {
-      document.getElementById('you-card').className = 'split-card winner';
-      yourTimeEl.className = 'split-time winner-time';
-      document.getElementById('fleet-card').className = 'split-card';
-      document.getElementById('delta-val').textContent = '−'+diff+' min';
-      document.getElementById('delta-val').className = 'delta-val';
-    } else {
-      document.getElementById('fleet-card').className = 'split-card winner';
-      document.getElementById('you-card').className = 'split-card';
-      yourTimeEl.className = 'split-time';
-      yourTimeEl.style.color='var(--text)';
-      document.getElementById('delta-val').textContent = '+'+Math.abs(diff)+' min behind';
-      document.getElementById('delta-val').className = 'delta-val neg';
-    }
-
-    const rWrap = document.getElementById('reward-wrap');
-    if (userWon) {
-      const r = getReward(diff);
-      if (r) {
-        rWrap.innerHTML = `
-          <div class="reward-card pop">
-            <div class="r-eyebrow">comma prime credit unlocked</div>
-            <div class="r-amount">${r.pct}<span class="r-pct">%</span></div>
-            <div class="r-off">OFF YOUR NEXT MONTH</div>
-            <div class="r-code">${rcode()}</div>
-            <div class="r-expires">Applied to your prime account · expires in 30 days</div>
-            <div class="r-next">${r.next}</div>
-          </div>`;
-      } else {
-        rWrap.innerHTML = `
-          <div class="no-reward-card">
-            <div class="no-reward-title">Nice run</div>
-            <div class="no-reward-sub">You won, but didn’t hit a reward tier.<br/><strong>Beat the fleet by 1+ minute</strong> to unlock credit.</div>
-          </div>`;
+      function safeClassToggle(el, className, add) {
+        if (!el) return;
+        el.classList[add ? 'add' : 'remove'](className);
       }
-    } else {
-      rWrap.innerHTML = `
-        <div class="no-reward-card">
-          <div class="no-reward-title">Fleet wins this one</div>
-          <div class="no-reward-sub">Baseline route held up on this corridor.<br/><strong>Your drive still helped validate the model.</strong></div>
-        </div>`;
-    }
 
-    document.getElementById('lb-your-time').textContent = userWon ? '+'+diff+' min' : '—';
+      function startTimer() {
+        stopTimer();
+        timerSecs = 0;
+        if (els.devTimer) els.devTimer.textContent = '00:00';
+        timerInterval = setInterval(() => {
+          timerSecs += 1;
+          const m = String(Math.floor(timerSecs / 60)).padStart(2, '0');
+          const s = String(timerSecs % 60).padStart(2, '0');
+          if (els.devTimer) els.devTimer.textContent = `${m}:${s}`;
+        }, 1000);
+      }
 
-    setTimeout(()=>drawResultMap(userWon), 100);
+      function stopTimer() {
+        if (timerInterval) clearInterval(timerInterval);
+        timerInterval = null;
+      }
 
-    setTimeout(()=>document.getElementById('step-map').classList.add('show'), 200);
-    setTimeout(()=>document.getElementById('step-time').classList.add('show'), 900);
-    setTimeout(()=>document.getElementById('step-reward').classList.add('show'), 1600);
-    setTimeout(()=>document.getElementById('step-lb').classList.add('show'), 2200);
-  }
+      function drawResultMap(userWon) {
+        const canvas = els.resultCanvas;
+        if (!canvas || !canvas.parentElement) return;
 
-  function endDrive() { runReveal(true, 11, 8); }
-  function endDriveLoss() { runReveal(false, 8, 11); }
+        const box = canvas.parentElement;
+        const dpr = window.devicePixelRatio || 1;
+        const W = box.clientWidth;
+        const H = box.clientHeight;
+        if (!W || !H) return;
 
-  function resetDemo() {
-    document.getElementById('screen-reveal').classList.remove('active');
-    document.getElementById('screen-drive').classList.add('active');
-    startTimer();
-  }
+        canvas.width = W * dpr;
+        canvas.height = H * dpr;
+        canvas.style.width = `${W}px`;
+        canvas.style.height = `${H}px`;
 
-  // Redraw canvas on resize/orientation change while reveal is active
-  window.addEventListener('resize', () => {
-    const revealActive = document.getElementById('screen-reveal').classList.contains('active');
-    if (revealActive) drawResultMap(lastUserWon);
-  });
-</script>
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.scale(dpr, dpr);
+
+        ctx.fillStyle = '#080c0a';
+        ctx.fillRect(0, 0, W, H);
+
+        const streets = [
+          { x1: 0, y1: H * 0.22, x2: W, y2: H * 0.22, wide: true, name: 'MARKET ST', nx: W * 0.25, ny: H * 0.22 - 6 },
+          { x1: 0, y1: H * 0.48, x2: W, y2: H * 0.48, wide: true, name: 'MISSION ST', nx: W * 0.5, ny: H * 0.48 - 6 },
+          { x1: 0, y1: H * 0.72, x2: W, y2: H * 0.72, wide: false, name: 'FOLSOM ST', nx: W * 0.2, ny: H * 0.72 - 6 },
+          { x1: W * 0.12, y1: 0, x2: W * 0.12, y2: H, wide: true, name: 'VAN NESS', vert: true, nx: W * 0.12 + 4, ny: H * 0.38 },
+          { x1: W * 0.35, y1: 0, x2: W * 0.35, y2: H, wide: false, name: 'GOUGH', vert: true, nx: W * 0.35 + 4, ny: H * 0.8 },
+          { x1: W * 0.55, y1: 0, x2: W * 0.55, y2: H, wide: false, name: 'OCTAVIA', vert: true, nx: W * 0.55 + 4, ny: H * 0.15 },
+          { x1: W * 0.75, y1: 0, x2: W * 0.75, y2: H, wide: false, name: '4TH ST', vert: true, nx: W * 0.75 + 4, ny: H * 0.6 },
+          { x1: W * 0.88, y1: H * 0.1, x2: W * 0.88, y2: H, wide: false, name: '', vert: true, nx: 0, ny: 0 }
+        ];
+
+        streets.forEach((s) => {
+          ctx.beginPath();
+          ctx.moveTo(s.x1, s.y1);
+          ctx.lineTo(s.x2, s.y2);
+          ctx.strokeStyle = '#0d0d0d';
+          ctx.lineWidth = s.wide ? 18 : 11;
+          ctx.lineCap = 'round';
+          ctx.stroke();
+
+          ctx.beginPath();
+          ctx.moveTo(s.x1, s.y1);
+          ctx.lineTo(s.x2, s.y2);
+          ctx.strokeStyle = s.wide ? '#1c2018' : '#161a13';
+          ctx.lineWidth = s.wide ? 14 : 8;
+          ctx.stroke();
+
+          if (s.wide) {
+            ctx.beginPath();
+            ctx.moveTo(s.x1, s.y1);
+            ctx.lineTo(s.x2, s.y2);
+            ctx.strokeStyle = 'rgba(255,220,50,0.1)';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([8, 12]);
+            ctx.stroke();
+            ctx.setLineDash([]);
+          }
+        });
+
+        ctx.font = '600 7px "JetBrains Mono", monospace';
+        streets.forEach((s) => {
+          if (!s.name) return;
+          ctx.save();
+          if (s.vert) {
+            ctx.translate(s.nx, s.ny);
+            ctx.rotate(-Math.PI / 2);
+          }
+          ctx.fillStyle = 'rgba(255,255,255,0.12)';
+          ctx.fillText(s.name, s.vert ? 0 : s.nx, s.vert ? 0 : s.ny);
+          ctx.restore();
+        });
+
+        [
+          [W * 0.12, H * 0.48], [W * 0.35, H * 0.48], [W * 0.55, H * 0.48], [W * 0.75, H * 0.48], [W * 0.88, H * 0.48],
+          [W * 0.12, H * 0.22], [W * 0.75, H * 0.22], [W * 0.88, H * 0.22],
+          [W * 0.12, H * 0.72], [W * 0.55, H * 0.72], [W * 0.75, H * 0.72]
+        ].forEach(([x, y]) => {
+          ctx.beginPath();
+          ctx.arc(x, y, 3, 0, Math.PI * 2);
+          ctx.fillStyle = '#1e1e1e';
+          ctx.fill();
+        });
+
+        const fleet = [{ x: W * 0.12, y: H * 0.48 }, { x: W * 0.88, y: H * 0.48 }, { x: W * 0.88, y: H * 0.22 }];
+        const yours = [{ x: W * 0.12, y: H * 0.48 }, { x: W * 0.12, y: H * 0.72 }, { x: W * 0.75, y: H * 0.72 }, { x: W * 0.75, y: H * 0.22 }, { x: W * 0.88, y: H * 0.22 }];
+
+        function drawRoute(pts, color, glow, w, dashed) {
+          ctx.beginPath();
+          ctx.moveTo(pts[0].x, pts[0].y);
+          pts.slice(1).forEach((p) => ctx.lineTo(p.x, p.y));
+          ctx.strokeStyle = glow;
+          ctx.lineWidth = w + 10;
+          ctx.lineCap = 'round';
+          ctx.lineJoin = 'round';
+          ctx.globalAlpha = 0.15;
+          if (dashed) ctx.setLineDash([8, 8]);
+          ctx.stroke();
+          ctx.globalAlpha = 1;
+          ctx.setLineDash([]);
+
+          ctx.beginPath();
+          ctx.moveTo(pts[0].x, pts[0].y);
+          pts.slice(1).forEach((p) => ctx.lineTo(p.x, p.y));
+          ctx.strokeStyle = color;
+          ctx.lineWidth = w;
+          if (dashed) ctx.setLineDash([8, 8]);
+          ctx.stroke();
+          ctx.setLineDash([]);
+        }
+
+        function arrow(from, to, color) {
+          const dx = to.x - from.x;
+          const dy = to.y - from.y;
+          const l = Math.sqrt(dx * dx + dy * dy);
+          if (l < 1) return;
+          const mx = from.x + dx * 0.55;
+          const my = from.y + dy * 0.55;
+          const s = 5;
+          ctx.save();
+          ctx.translate(mx, my);
+          ctx.rotate(Math.atan2(dy, dx));
+          ctx.beginPath();
+          ctx.moveTo(s, 0);
+          ctx.lineTo(-s * 0.6, -s * 0.5);
+          ctx.lineTo(-s * 0.6, s * 0.5);
+          ctx.closePath();
+          ctx.fillStyle = color;
+          ctx.globalAlpha = 0.65;
+          ctx.fill();
+          ctx.globalAlpha = 1;
+          ctx.restore();
+        }
+
+        drawRoute(fleet, 'rgba(200,200,200,0.4)', '#fff', 2.5, true);
+        fleet.slice(1).forEach((p, i) => arrow(fleet[i], p, 'rgba(200,200,200,0.5)'));
+
+        const yourColor = userWon ? '#ff3c00' : 'rgba(255,60,0,0.4)';
+        drawRoute(yours, yourColor, '#ff3c00', 3, false);
+        yours.slice(1).forEach((p, i) => arrow(yours[i], p, userWon ? '#ff6030' : 'rgba(255,96,48,0.4)'));
+
+        function pin(x, y, label, color) {
+          ctx.beginPath();
+          ctx.arc(x, y - 13, 7, 0, Math.PI * 2);
+          ctx.fillStyle = color;
+          ctx.fill();
+          ctx.strokeStyle = '#000';
+          ctx.lineWidth = 2;
+          ctx.stroke();
+
+          ctx.beginPath();
+          ctx.moveTo(x - 3.5, y - 7);
+          ctx.lineTo(x + 3.5, y - 7);
+          ctx.lineTo(x, y);
+          ctx.closePath();
+          ctx.fillStyle = color;
+          ctx.fill();
+
+          ctx.font = 'bold 7px Inter,sans-serif';
+          ctx.fillStyle = '#000';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(label, x, y - 13);
+          ctx.textAlign = 'left';
+          ctx.textBaseline = 'alphabetic';
+        }
+
+        pin(W * 0.12, H * 0.48, 'A', '#fff');
+        pin(W * 0.88, H * 0.22, 'B', '#25c45e');
+
+        const bx = W * 0.5;
+        const by = H * 0.9;
+        ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(bx - 42, by - 11, 84, 22, 3);
+        else ctx.rect(bx - 42, by - 11, 84, 22);
+        ctx.fillStyle = userWon ? 'rgba(255,60,0,0.18)' : 'rgba(255,255,255,0.06)';
+        ctx.fill();
+        ctx.strokeStyle = userWon ? 'rgba(255,60,0,0.5)' : 'rgba(255,255,255,0.15)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        ctx.font = 'bold 10px "JetBrains Mono", monospace';
+        ctx.fillStyle = userWon ? '#ff3c00' : '#555';
+        ctx.textAlign = 'center';
+        ctx.fillText(userWon ? 'YOU BEAT THE FLEET' : 'FLEET WINS THIS ONE', bx, by + 4);
+        ctx.textAlign = 'left';
+      }
+
+      function getReward(diff) {
+        if (diff >= 5) return { pct: '50', next: "That's the max tier. Legend." };
+        if (diff >= 3) return { pct: '15', next: 'Beat by <strong>5+ min</strong> next time for <strong>50% off</strong>' };
+        if (diff >= 1) return { pct: '10', next: 'Beat by <strong>3+ min</strong> next time for <strong>15% off</strong>' };
+        return null;
+      }
+
+      function rcode() {
+        const a = Math.random().toString(36).slice(2, 6).toUpperCase();
+        const b = Math.random().toString(36).slice(2, 6).toUpperCase();
+        return `BTF-${a}-${b}`;
+      }
+
+      function setResultBadge(userWon) {
+        if (!els.resultBadge) return;
+        if (userWon) {
+          els.resultBadge.style.cssText = 'background:var(--green-dim);border:1px solid var(--green-border);color:var(--green);display:flex;align-items:center;gap:5px;font-family:JetBrains Mono,monospace;font-size:9px;letter-spacing:1.5px;padding:4px 9px;border-radius:2px;';
+          els.resultBadge.innerHTML = '<div class="pulse"></div>YOU WIN';
+        } else {
+          els.resultBadge.style.cssText = 'background:var(--red-dim);border:1px solid var(--red-border);color:var(--red);display:flex;align-items:center;gap:5px;font-family:JetBrains Mono,monospace;font-size:9px;letter-spacing:1.5px;padding:4px 9px;border-radius:2px;';
+          els.resultBadge.innerHTML = '<div style="width:5px;height:5px;background:var(--red);border-radius:50%;animation:blink 1.6s ease-in-out infinite"></div>FLEET WINS';
+        }
+      }
+
+      function resetRevealSteps() {
+        els.stepIds.forEach((id) => {
+          const node = byId(id);
+          safeClassToggle(node, 'show', false);
+        });
+      }
+
+      function showRevealSteps() {
+        const steps = [200, 900, 1600, 2200];
+        els.stepIds.forEach((id, i) => {
+          const node = byId(id);
+          if (!node) return;
+          if (reduceMotion) {
+            node.classList.add('show');
+          } else {
+            setTimeout(() => node.classList.add('show'), steps[i]);
+          }
+        });
+      }
+
+      function runReveal(userWon, fleetMins, yourMins) {
+        lastUserWon = userWon;
+        stopTimer();
+
+        const diff = fleetMins - yourMins;
+        safeClassToggle(els.screenDrive, 'active', false);
+        safeClassToggle(els.screenReveal, 'active', true);
+
+        resetRevealSteps();
+        setResultBadge(userWon);
+
+        if (els.revealTitle) {
+          els.revealTitle.innerHTML = userWon
+            ? 'You <span class="green">beat</span> the fleet'
+            : 'Fleet <span class="red">wins</span> this one';
+        }
+
+        if (els.yourTime) els.yourTime.style.color = '';
+        if (els.fleetTime) els.fleetTime.innerHTML = `${fleetMins}<span class="u">min</span>`;
+        if (els.yourTime) els.yourTime.innerHTML = `${yourMins}<span class="u">min</span>`;
+
+        if (userWon) {
+          if (els.youCard) els.youCard.className = 'split-card winner';
+          if (els.yourTime) els.yourTime.className = 'split-time winner-time';
+          if (els.fleetCard) els.fleetCard.className = 'split-card';
+          if (els.deltaVal) {
+            els.deltaVal.textContent = `−${diff} min`;
+            els.deltaVal.className = 'delta-val';
+          }
+        } else {
+          if (els.fleetCard) els.fleetCard.className = 'split-card winner';
+          if (els.youCard) els.youCard.className = 'split-card';
+          if (els.yourTime) {
+            els.yourTime.className = 'split-time';
+            els.yourTime.style.color = 'var(--text)';
+          }
+          if (els.deltaVal) {
+            els.deltaVal.textContent = `+${Math.abs(diff)} min behind`;
+            els.deltaVal.className = 'delta-val neg';
+          }
+        }
+
+        if (els.rewardWrap) {
+          if (userWon) {
+            const r = getReward(diff);
+            els.rewardWrap.innerHTML = r
+              ? `
+                <div class="reward-card pop">
+                  <div class="r-eyebrow">comma prime credit unlocked</div>
+                  <div class="r-amount">${r.pct}<span class="r-pct">%</span></div>
+                  <div class="r-off">OFF YOUR NEXT MONTH</div>
+                  <div class="r-code">${rcode()}</div>
+                  <div class="r-expires">Applied to your prime account · expires in 30 days</div>
+                  <div class="r-next">${r.next}</div>
+                </div>`
+              : `
+                <div class="no-reward-card">
+                  <div class="no-reward-title">Nice run</div>
+                  <div class="no-reward-sub">You won, but didn’t hit a reward tier.<br /><strong>Beat the fleet by 1+ minute</strong> to unlock credit.</div>
+                </div>`;
+          } else {
+            els.rewardWrap.innerHTML = `
+              <div class="no-reward-card">
+                <div class="no-reward-title">Fleet wins this one</div>
+                <div class="no-reward-sub">Baseline route held up on this corridor.<br /><strong>Your drive still helped validate the model.</strong></div>
+              </div>`;
+          }
+        }
+
+        if (els.lbYourTime) els.lbYourTime.textContent = userWon ? `+${diff} min` : '—';
+
+        if (reduceMotion) {
+          drawResultMap(userWon);
+        } else {
+          setTimeout(() => drawResultMap(userWon), 100);
+        }
+
+        showRevealSteps();
+      }
+
+      function endDrive() {
+        runReveal(true, 11, 8);
+      }
+
+      function endDriveLoss() {
+        runReveal(false, 8, 11);
+      }
+
+      function resetDemo() {
+        safeClassToggle(els.screenReveal, 'active', false);
+        safeClassToggle(els.screenDrive, 'active', true);
+        resetRevealSteps();
+
+        if (els.resultBadge) {
+          els.resultBadge.style.cssText = 'background:var(--green-dim);border-color:var(--green-border);color:var(--green)';
+          els.resultBadge.innerHTML = '<div class="pulse"></div>YOU WIN';
+        }
+
+        if (els.revealTitle) els.revealTitle.innerHTML = 'You <span class="green">beat</span> the fleet';
+        if (els.fleetTime) els.fleetTime.innerHTML = '11<span class="u">min</span>';
+        if (els.yourTime) {
+          els.yourTime.innerHTML = '8<span class="u">min</span>';
+          els.yourTime.className = 'split-time winner-time';
+          els.yourTime.style.color = '';
+        }
+        if (els.fleetCard) els.fleetCard.className = 'split-card';
+        if (els.youCard) els.youCard.className = 'split-card winner';
+        if (els.deltaVal) {
+          els.deltaVal.textContent = '−3 min';
+          els.deltaVal.className = 'delta-val';
+        }
+        if (els.lbYourTime) els.lbYourTime.textContent = '+3 min';
+
+        startTimer();
+      }
+
+      if (els.endDriveBtn) els.endDriveBtn.addEventListener('click', endDrive);
+      if (els.simulateLossBtn) els.simulateLossBtn.addEventListener('click', endDriveLoss);
+      if (els.backToDriveBtn) els.backToDriveBtn.addEventListener('click', resetDemo);
+
+      window.addEventListener('resize', () => {
+        const revealActive = !!els.screenReveal?.classList.contains('active');
+        if (revealActive) drawResultMap(lastUserWon);
+      });
+
+      startTimer();
+    })();
+  </script>
 </body>
 </html>
