@@ -192,7 +192,7 @@
   @keyframes pop { from { opacity:0; transform:scale(0.88); } to { opacity:1; transform:scale(1); } }
   .r-eyebrow { font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:2px; color:var(--green); text-transform:uppercase; margin-bottom:10px; }
   .r-amount { font-size:56px; font-weight:700; letter-spacing:-2px; color:var(--green); line-height:1; }
-  .r-unit { font-size:26px; vertical-align:super; }
+  .r-unit { font-size:32px; font-weight:700; vertical-align:baseline; margin-left:2px; }
   .r-off { font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:var(--muted); margin-top:3px; }
   .r-code { margin-top:12px; padding:8px 12px; background:rgba(37,196,94,0.04); border:1px dashed rgba(37,196,94,0.22); border-radius:2px; font-family:'JetBrains Mono',monospace; font-size:13px; letter-spacing:2px; color:var(--green); }
   .r-expires { margin-top:5px; font-family:'JetBrains Mono',monospace; font-size:8px; color:var(--muted); }
@@ -289,9 +289,9 @@
 <div class="incentive-section">
   <div class="incentive-banner">
     <div class="inc-icon">🏁</div>
-    <div class="inc-text">Beat the fleet by <strong>1+ min</strong> and earn money off your ride. Bigger gap, bigger reward.</div>
+    <div class="inc-text">Beat the fleet by <strong>1+ min</strong> and earn credit off your comma prime subscription. Bigger gap, bigger cut.</div>
   </div>
-  <div class="eyebrow" style="margin-bottom:10px">Reward tiers</div>
+  <div class="eyebrow" style="margin-bottom:10px">Reward tiers · comma prime credit</div>
   <div class="tier-row">
     <span class="tier-by">BEAT BY</span>
     <span class="tier-range">Under 1 min</span>
@@ -300,17 +300,17 @@
   <div class="tier-row hi">
     <span class="tier-by">BEAT BY</span>
     <span class="tier-range">1 – 2 min</span>
-    <span class="tier-rew g">$1.00 off</span>
+    <span class="tier-rew g">10% off</span>
   </div>
   <div class="tier-row">
     <span class="tier-by">BEAT BY</span>
     <span class="tier-range">3 – 4 min</span>
-    <span class="tier-rew y">$2.50 off</span>
+    <span class="tier-rew y">15% off</span>
   </div>
   <div class="tier-row">
     <span class="tier-by">BEAT BY</span>
     <span class="tier-range">5+ min</span>
-    <span class="tier-rew r">FREE RIDE</span>
+    <span class="tier-rew r">50% off</span>
   </div>
 </div>
 
@@ -362,12 +362,12 @@
   </div>
 
   <div class="reward-card" id="reward-card">
-    <div class="r-eyebrow">Reward unlocked</div>
-    <div class="r-amount"><span class="r-unit" id="r-unit">$</span><span id="r-val">2.50</span></div>
-    <div class="r-off" id="r-off">OFF YOUR RIDE</div>
+    <div class="r-eyebrow">comma prime credit unlocked</div>
+    <div class="r-amount"><span id="r-val">15</span><span class="r-unit">%</span></div>
+    <div class="r-off" id="r-off">OFF YOUR NEXT MONTH</div>
     <div class="r-code" id="r-code">BTF-3MIN-X9K2</div>
-    <div class="r-expires">Valid this ride · auto-applied at checkout</div>
-    <div class="r-next" id="r-next">Beat by <strong>5+ min</strong> next time for a free ride</div>
+    <div class="r-expires">Applied to your prime account · expires in 30 days</div>
+    <div class="r-next" id="r-next">Beat by <strong>5+ min</strong> next time for <strong>50% off</strong></div>
   </div>
 
   <div class="ov-note" id="ov-note">
@@ -735,9 +735,9 @@
   }
 
   function getReward(m) {
-    if (m >= 5) return { unit:'', val:'FREE', off:'RIDE ON US', next:"That's the max. Legend." };
-    if (m >= 3) return { unit:'$', val:'2.50', off:'OFF YOUR RIDE', next:'Beat by <strong>5+ min</strong> next time for a free ride' };
-    if (m >= 1) return { unit:'$', val:'1.00', off:'OFF YOUR RIDE', next:'Beat by <strong>3+ min</strong> next time for $2.50 off' };
+    if (m >= 5) return { val:'50', off:'OFF YOUR NEXT MONTH', next:"That's the max tier. Legend." };
+    if (m >= 3) return { val:'15', off:'OFF YOUR NEXT MONTH', next:'Beat by <strong>5+ min</strong> next time for <strong>50% off</strong>' };
+    if (m >= 1) return { val:'10', off:'OFF YOUR NEXT MONTH', next:'Beat by <strong>3+ min</strong> next time for <strong>15% off</strong>' };
     return null;
   }
 
@@ -758,7 +758,6 @@
       const r = getReward(saved);
       if (r) {
         card.style.display = 'block';
-        document.getElementById('r-unit').textContent = r.unit;
         document.getElementById('r-val').textContent = r.val;
         document.getElementById('r-off').textContent = r.off;
         document.getElementById('r-code').textContent = rcode();
