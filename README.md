@@ -2,17 +2,15 @@
 
 > *The AI thinks it knows the fastest way. Prove it wrong. Get paid.*
 
-A product concept and interactive mockup for gamifying autonomous vehicle rides — built with the comma four in mind.
+A product concept and interactive mockup for gamifying openpilot — built with the comma four in mind.
 
 ---
 
 ## The Problem Nobody's Talking About
 
-Autonomous fleets are trained on aggregate data. They're good at average. But cities aren't average — they're hyperlocal, they shift by hour, and the people who ride them every day know things no dataset has captured yet.
+openpilot knows the statistically optimal route. But the people driving with it every day know things the model doesn't: the side street that clears by 9am, the light that runs long on Tuesdays, the cut-through that shaves four minutes off a commute nobody has ever logged.
 
-That alley behind the farmer's market that clears by 9:15. The light on MLK Jr Way that runs 40 seconds longer on Tuesdays. The cut-through that shaves four minutes off a ride nobody's ever logged.
-
-That knowledge is sitting in people's heads, completely inaccessible to the model.
+That knowledge gets used once, then disappears.
 
 **Beat the Fleet puts it to work.**
 
@@ -20,14 +18,11 @@ That knowledge is sitting in people's heads, completely inaccessible to the mode
 
 ## How It Works
 
-Before your ride begins, you see two routes side by side:
+No setup. No pre-selecting a route. You just drive.
 
-- **The Fleet's pick** — the AI's optimal route, time estimate, traffic, stops
-- **Your pick** — a route you think is faster, based on what you know
+When you deviate from openpilot's suggested path, the system notices. It silently runs both timelines: your actual route and the fleet's recommended route, and compares them at the end of your drive.
 
-You choose. The ride runs. The clock doesn't lie.
-
-Beat the fleet by a minute or more and earn credit off your comma prime subscription. The bigger the gap, the bigger the cut.
+Beat the fleet by a minute or more and you earn credit off your comma prime subscription. The bigger the gap, the bigger the cut.
 
 | Beat the fleet by | Reward |
 |---|---|
@@ -40,26 +35,24 @@ Beat the fleet by a minute or more and earn credit off your comma prime subscrip
 
 ## Why This Is Actually Smart
 
-**For riders** — you're not a passenger anymore. You have skin in the game. A four-minute ride becomes something you've been thinking about since yesterday.
+**For drivers:** you're not just supervising anymore. Every time you take your own turn, there's a scorecard waiting at the end. Local knowledge becomes something worth keeping track of.
 
-**For the fleet** — every ride is a labeled training sample with a real outcome attached. Shortcuts that win get absorbed into the model. Routes that lose confirm the AI was right. Either way, the model gets smarter. The cost of a 15% prime credit is nothing compared to a human-verified shortcut that improves routing for every future rider on that corridor.
+**For the model:** every deviation is already being logged. Beat the Fleet just closes the loop by surfacing that comparison back to the driver with a reward attached. Shortcuts that win get absorbed into training data. Routes that lose confirm the AI was right. Either way, comma gets human-verified route data from people who are motivated to try. The cost of a 15% prime credit is nothing compared to what a real local shortcut is worth across the fleet.
 
-**For growth** — people will ride more. They'll recruit their friends. They'll stake their local knowledge against a machine and tell everyone about it when they win. That's word-of-mouth you can't buy.
+**For growth:** drivers will talk about it. They'll try routes they've been curious about. They'll check the leaderboard. That's engagement and retention that compounds.
 
 ---
 
 ## The Mockup
 
-`beat-the-fleet.html` — open it in any browser, no dependencies, no build step, no nonsense.
+`beat-the-fleet.html` — open it in any browser, no dependencies, no build step.
 
-Built for a mobile/in-car screen. Includes:
+Simulates two states:
 
-- Live map with AI route and your route overlaid simultaneously
-- Route cards with time, distance, traffic, and stop counts
-- Reward tier table front and center *before* you commit — so you know what you're playing for
-- Result screen with animated reward card, one-time promo code, and a nudge to the next tier up
-- Local leaderboard — who's beating the fleet in your area this week
-- Fleet-wide stats ticker — routes learned, global wins, today's top shortcut
+- **Active drive:** openpilot HUD with a subtle deviation tracking indicator running in the corner
+- **Post-ride reveal:** sequential scorecard that shows your route vs the fleet route on a live map, the time split, and the reward unlock if you won
+
+Also includes an all-time local legends leaderboard and a fleet-wide stats ticker.
 
 ---
 
