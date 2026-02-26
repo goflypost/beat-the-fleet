@@ -26,14 +26,12 @@
   * { margin:0; padding:0; box-sizing:border-box; }
   body { background:var(--black); color:var(--text); font-family:'Inter',sans-serif; min-height:100vh; display:flex; flex-direction:column; align-items:center; -webkit-font-smoothing:antialiased; letter-spacing:-0.01em; }
 
-  /* ─── SHARED ─── */
   .screen { width:100%; max-width:480px; display:none; flex-direction:column; min-height:100vh; }
   .screen.active { display:flex; }
   .mono { font-family:'JetBrains Mono',monospace; }
   .eyebrow { font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:2px; color:var(--muted); text-transform:uppercase; }
   .section { width:100%; padding:14px 20px; border-bottom:1px solid var(--border); }
 
-  /* ─── HEADER ─── */
   .header { width:100%; padding:15px 20px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); }
   .logo { display:flex; align-items:baseline; gap:5px; font-size:14px; font-weight:600; color:var(--white); }
   .logo .cm { color:var(--red); font-size:22px; font-weight:700; line-height:1; }
@@ -43,14 +41,12 @@
   .pulse { width:5px; height:5px; background:var(--green); border-radius:50%; animation:blink 1.6s ease-in-out infinite; }
   @keyframes blink { 0%,100%{opacity:1}50%{opacity:0.15} }
 
-  /* ─── SCREEN 1: DRIVING ─── */
   #screen-drive .openpilot-ui {
     position:relative; width:100%; flex:1;
     background: linear-gradient(180deg, #0a1a0f 0%, #050d07 100%);
     overflow:hidden; min-height:420px;
   }
 
-  /* Road perspective */
   .road {
     position:absolute; bottom:0; left:50%; transform:translateX(-50%);
     width:0; height:0;
@@ -73,7 +69,6 @@
     to { transform: translateY(64px); }
   }
 
-  /* openpilot overlay HUD */
   .hud {
     position:absolute; inset:0;
     display:flex; flex-direction:column;
@@ -103,7 +98,6 @@
   .hud-status .op-label { font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:2px; color:var(--green); }
   .hud-status .op-status { font-size:11px; font-weight:600; color:var(--white); margin-top:2px; }
 
-  /* steering wheel indicator */
   .steering {
     position:absolute; bottom:80px; left:50%; transform:translateX(-50%);
     width:60px; height:60px;
@@ -127,7 +121,6 @@
     border-radius:2px;
   }
 
-  /* path guide lines */
   .path-left, .path-right {
     position:absolute; bottom:0;
     width:3px; height:240px;
@@ -136,7 +129,6 @@
   .path-left { left:38%; background:linear-gradient(to top, rgba(37,196,94,0.6), transparent); transform:perspective(200px) rotateX(20deg); }
   .path-right { right:38%; background:linear-gradient(to top, rgba(37,196,94,0.6), transparent); transform:perspective(200px) rotateX(20deg); }
 
-  /* ── DEVIATION PILL (subtle) ── */
   .deviation-pill {
     position:absolute; top:16px; left:50%; transform:translateX(-50%);
     background:rgba(255,60,0,0.15);
@@ -152,7 +144,6 @@
   .dev-text { font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1.5px; color:var(--red); text-transform:uppercase; }
   .dev-timer { font-family:'JetBrains Mono',monospace; font-size:9px; color:rgba(255,60,0,0.7); letter-spacing:1px; }
 
-  /* hud bottom bar */
   .hud-bottom {
     display:flex; justify-content:space-between; align-items:flex-end;
   }
@@ -174,7 +165,6 @@
   .hud-eta .eta-val { font-size:18px; font-weight:700; color:var(--white); letter-spacing:-0.5px; }
   .hud-eta .eta-label { font-family:'JetBrains Mono',monospace; font-size:8px; color:var(--muted); }
 
-  /* drive screen CTA */
   .drive-cta {
     padding:16px 20px 32px;
     display:flex; flex-direction:column; gap:10px;
@@ -186,7 +176,6 @@
   .btn-ghost { width:100%; padding:12px; background:none; border:1px solid var(--border); border-radius:3px; color:var(--muted); font-family:'Inter',sans-serif; font-size:13px; cursor:pointer; transition:border-color 0.12s, color 0.12s; }
   .btn-ghost:hover { border-color:var(--border-hi); color:var(--text); }
 
-  /* ─── SCREEN 2: REVEAL ─── */
   #screen-reveal { background:var(--black); }
 
   .reveal-header { padding:20px 20px 0; }
@@ -195,23 +184,19 @@
   .reveal-title .red { color:var(--red); }
   .reveal-title .green { color:var(--green); }
 
-  /* reveal steps */
   .reveal-step { opacity:0; transform:translateY(12px); transition:opacity 0.5s ease, transform 0.5s ease; }
   .reveal-step.show { opacity:1; transform:translateY(0); }
 
-  /* step 1: map */
   .result-map-wrap { padding:14px 20px; }
   .result-map { position:relative; width:100%; height:220px; background:#080c0a; border:1px solid var(--border); border-radius:4px; overflow:hidden; }
   #result-canvas { position:absolute; inset:0; width:100%; height:100%; }
 
-  /* route legend */
   .route-legend { display:flex; gap:16px; margin-top:10px; }
   .legend-item { display:flex; align-items:center; gap:6px; font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:var(--muted); }
   .legend-dot { width:8px; height:3px; border-radius:1px; }
   .legend-dot.fleet { background:rgba(255,255,255,0.35); }
   .legend-dot.you { background:var(--red); }
 
-  /* step 2: time split */
   .time-split { padding:0 20px 14px; }
   .split-cards { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:12px; }
   .split-card { background:var(--card); border:1px solid var(--border); border-radius:3px; padding:14px; }
@@ -234,7 +219,6 @@
   .delta-val { font-size:22px; font-weight:700; letter-spacing:-0.5px; color:var(--green); }
   .delta-val.neg { color:var(--red); }
 
-  /* step 3: reward */
   .reward-wrap { padding:0 20px 14px; }
   .reward-card {
     background:var(--black); border:1px solid var(--green-border); border-radius:3px;
@@ -260,7 +244,6 @@
   .no-reward-sub { font-size:12px; color:var(--muted); line-height:1.6; }
   .no-reward-sub strong { color:var(--text); }
 
-  /* ─── LEADERBOARD ─── */
   .lb-section { padding:14px 20px; border-top:1px solid var(--border); }
   .lb-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
   .lb-title { font-size:13px; font-weight:600; color:var(--white); }
@@ -278,10 +261,8 @@
   .lb-time { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--green); font-weight:700; }
   .lb-date { font-family:'JetBrains Mono',monospace; font-size:8px; color:var(--muted); margin-top:2px; }
 
-  /* reveal CTA */
   .reveal-cta { padding:16px 20px 36px; }
 
-  /* ticker */
   .ticker { width:100%; max-width:480px; overflow:hidden; border-bottom:1px solid var(--border); background:var(--surface); }
   .ticker-inner { display:flex; gap:40px; padding:8px 0; animation:scroll 22s linear infinite; white-space:nowrap; }
   @keyframes scroll { from{transform:translateX(0)}to{transform:translateX(-50%)} }
@@ -292,17 +273,12 @@
 </head>
 <body>
 
-<!-- ═══════════════════════════════════════
-     SCREEN 1 — DRIVING (openpilot active)
-═══════════════════════════════════════ -->
 <div id="screen-drive" class="screen active">
-
   <div class="header">
     <div class="logo"><span class="cm">,</span>comma<span class="slash">/</span><span class="sub">beat the fleet</span></div>
     <div class="live-badge"><div class="pulse"></div>OPENPILOT</div>
   </div>
 
-  <!-- openpilot HUD mockup -->
   <div class="openpilot-ui">
     <div class="road"></div>
     <div class="road-lines">
@@ -321,11 +297,10 @@
           <div class="unit">MPH</div>
         </div>
 
-        <!-- subtle deviation pill -->
-        <div class="deviation-pill" id="dev-pill">
+        <div class="deviation-pill" id="dev-pill" aria-live="polite">
           <div class="dev-dot"></div>
-          <div class="dev-text">deviation detected · tracking</div>
-          <div class="dev-timer" id="dev-timer">02:14</div>
+          <div class="dev-text">tracking deviation</div>
+          <div class="dev-timer" id="dev-timer">00:00</div>
         </div>
 
         <div class="hud-status">
@@ -348,19 +323,13 @@
   </div>
 
   <div class="drive-cta">
-    <div class="drive-note">// you deviated · fleet route still running in background</div>
-    <button class="btn-primary" onclick="endDrive()">End drive · see results</button>
-    <button class="btn-ghost" onclick="endDriveLoss()">Simulate fleet wins →</button>
+    <div class="drive-note">// deviation active · fleet baseline still running in background</div>
+    <button class="btn-primary" onclick="endDrive()" aria-label="End drive and see results">End drive · see results</button>
+    <button class="btn-ghost" onclick="endDriveLoss()" aria-label="Simulate fleet winning">Simulate fleet wins →</button>
   </div>
-
 </div>
 
-
-<!-- ═══════════════════════════════════════
-     SCREEN 2 — POST-RIDE REVEAL
-═══════════════════════════════════════ -->
 <div id="screen-reveal" class="screen">
-
   <div class="header">
     <div class="logo"><span class="cm">,</span>comma<span class="slash">/</span><span class="sub">beat the fleet</span></div>
     <div class="live-badge" id="result-badge" style="background:var(--green-dim);border-color:var(--green-border);color:var(--green)"><div class="pulse"></div>YOU WIN</div>
@@ -381,7 +350,6 @@
     </div>
   </div>
 
-  <!-- STEP 1: Map overlay -->
   <div class="reveal-step" id="step-map">
     <div class="reveal-header section">
       <div class="reveal-eyebrow">Your drive vs the fleet</div>
@@ -398,7 +366,6 @@
     </div>
   </div>
 
-  <!-- STEP 2: Time split -->
   <div class="reveal-step" id="step-time">
     <div class="time-split section">
       <div class="eyebrow" style="margin-bottom:12px">Time comparison</div>
@@ -406,7 +373,7 @@
         <div class="split-card" id="fleet-card">
           <div class="split-label fleet">Fleet AI</div>
           <div class="split-time" id="fleet-time">11<span class="u">min</span></div>
-          <div class="split-sub" id="fleet-sub">optimal route</div>
+          <div class="split-sub" id="fleet-sub">baseline route</div>
         </div>
         <div class="split-card winner" id="you-card">
           <div class="split-label you">You</div>
@@ -421,12 +388,10 @@
     </div>
   </div>
 
-  <!-- STEP 3: Reward -->
   <div class="reveal-step" id="step-reward">
     <div class="reward-wrap section" id="reward-wrap"></div>
   </div>
 
-  <!-- Leaderboard -->
   <div class="reveal-step lb-section" id="step-lb">
     <div class="lb-head">
       <div class="lb-title">All time local legends</div>
@@ -483,41 +448,65 @@
   </div>
 
   <div class="reveal-cta">
-    <button class="btn-primary" onclick="resetDemo()">← Back to drive demo</button>
+    <button class="btn-primary" onclick="resetDemo()" aria-label="Back to drive demo">← Back to drive demo</button>
   </div>
-
 </div>
 
 <script>
-  // ─── TIMER ───
+  // ─────────────────────────────────────────
+  // State
+  // ─────────────────────────────────────────
   let timerInterval = null;
-  let timerSecs = 134;
+  let timerSecs = 0;
+  let lastUserWon = true;
+
+  // ─────────────────────────────────────────
+  // Timer (counts UP from 00:00)
+  // ─────────────────────────────────────────
   function startTimer() {
+    stopTimer();
+    timerSecs = 0;
+    const el = document.getElementById('dev-timer');
+    if (el) el.textContent = '00:00';
     timerInterval = setInterval(() => {
       timerSecs++;
       const m = String(Math.floor(timerSecs / 60)).padStart(2,'0');
       const s = String(timerSecs % 60).padStart(2,'0');
-      const el = document.getElementById('dev-timer');
-      if (el) el.textContent = m + ':' + s;
+      const tEl = document.getElementById('dev-timer');
+      if (tEl) tEl.textContent = m + ':' + s;
     }, 1000);
   }
+
+  function stopTimer() {
+    if (timerInterval) clearInterval(timerInterval);
+    timerInterval = null;
+  }
+
   startTimer();
 
-  // ─── RESULT MAP CANVAS ───
+  // ─────────────────────────────────────────
+  // Result map
+  // ─────────────────────────────────────────
   function drawResultMap(userWon) {
     const canvas = document.getElementById('result-canvas');
+    if (!canvas) return;
+
     const box = canvas.parentElement;
     const dpr = window.devicePixelRatio || 1;
     const W = box.clientWidth, H = box.clientHeight;
-    canvas.width = W * dpr; canvas.height = H * dpr;
-    canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+
+    canvas.width = W * dpr;
+    canvas.height = H * dpr;
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+
     const ctx = canvas.getContext('2d');
+    ctx.setTransform(1,0,0,1,0,0);
     ctx.scale(dpr, dpr);
 
-    // bg
-    ctx.fillStyle = '#080c0a'; ctx.fillRect(0,0,W,H);
+    ctx.fillStyle = '#080c0a';
+    ctx.fillRect(0,0,W,H);
 
-    // streets
     const streets = [
       {x1:0,y1:H*0.22,x2:W,y2:H*0.22,wide:true,name:'MARKET ST',nx:W*0.25,ny:H*0.22-6},
       {x1:0,y1:H*0.48,x2:W,y2:H*0.48,wide:true,name:'MISSION ST',nx:W*0.5,ny:H*0.48-6},
@@ -540,7 +529,6 @@
       }
     });
 
-    // street names
     ctx.font = '600 7px "JetBrains Mono",monospace';
     streets.forEach(s => {
       if (!s.name) return;
@@ -551,16 +539,15 @@
       ctx.restore();
     });
 
-    // intersections
-    [[W*0.12,H*0.48],[W*0.35,H*0.48],[W*0.55,H*0.48],[W*0.75,H*0.48],[W*0.88,H*0.48],
-     [W*0.12,H*0.22],[W*0.75,H*0.22],[W*0.88,H*0.22],
-     [W*0.12,H*0.72],[W*0.55,H*0.72],[W*0.75,H*0.72]].forEach(([x,y])=>{
+    [
+      [W*0.12,H*0.48],[W*0.35,H*0.48],[W*0.55,H*0.48],[W*0.75,H*0.48],[W*0.88,H*0.48],
+      [W*0.12,H*0.22],[W*0.75,H*0.22],[W*0.88,H*0.22],
+      [W*0.12,H*0.72],[W*0.55,H*0.72],[W*0.75,H*0.72]
+    ].forEach(([x,y])=>{
       ctx.beginPath(); ctx.arc(x,y,3,0,Math.PI*2); ctx.fillStyle='#1e1e1e'; ctx.fill();
     });
 
-    // Fleet route: straight along Mission then up
     const fleet = [{x:W*0.12,y:H*0.48},{x:W*0.88,y:H*0.48},{x:W*0.88,y:H*0.22}];
-    // Your route: Folsom shortcut
     const yours = [{x:W*0.12,y:H*0.48},{x:W*0.12,y:H*0.72},{x:W*0.75,y:H*0.72},{x:W*0.75,y:H*0.22},{x:W*0.88,y:H*0.22}];
 
     function drawRoute(pts, color, glow, w, dashed) {
@@ -576,7 +563,8 @@
 
     function arrow(from,to,color) {
       const dx=to.x-from.x,dy=to.y-from.y,l=Math.sqrt(dx*dx+dy*dy);
-      if(l<1)return; const mx=from.x+dx*0.55,my=from.y+dy*0.55,s=5;
+      if(l<1)return;
+      const mx=from.x+dx*0.55,my=from.y+dy*0.55,s=5;
       ctx.save(); ctx.translate(mx,my); ctx.rotate(Math.atan2(dy,dx));
       ctx.beginPath(); ctx.moveTo(s,0); ctx.lineTo(-s*0.6,-s*0.5); ctx.lineTo(-s*0.6,s*0.5); ctx.closePath();
       ctx.fillStyle=color; ctx.globalAlpha=0.65; ctx.fill(); ctx.globalAlpha=1; ctx.restore();
@@ -589,7 +577,6 @@
     drawRoute(yours,yourColor,'#ff3c00',3,false);
     yours.slice(1).forEach((p,i)=>arrow(yours[i],p,userWon?'#ff6030':'rgba(255,96,48,0.4)'));
 
-    // pins
     function pin(x,y,label,color) {
       ctx.beginPath(); ctx.arc(x,y-13,7,0,Math.PI*2); ctx.fillStyle=color; ctx.fill();
       ctx.strokeStyle='#000'; ctx.lineWidth=2; ctx.stroke();
@@ -603,12 +590,14 @@
     pin(W*0.12,H*0.48,'A','#fff');
     pin(W*0.88,H*0.22,'B','#25c45e');
 
-    // "YOU SAVED" badge
     const bx=W*0.5,by=H*0.9;
     ctx.beginPath();
     if(ctx.roundRect) ctx.roundRect(bx-42,by-11,84,22,3); else ctx.rect(bx-42,by-11,84,22);
     ctx.fillStyle=userWon?'rgba(255,60,0,0.18)':'rgba(255,255,255,0.06)';
-    ctx.fill(); ctx.strokeStyle=userWon?'rgba(255,60,0,0.5)':'rgba(255,255,255,0.15)'; ctx.lineWidth=1; ctx.stroke();
+    ctx.fill();
+    ctx.strokeStyle=userWon?'rgba(255,60,0,0.5)':'rgba(255,255,255,0.15)';
+    ctx.lineWidth=1; ctx.stroke();
+
     ctx.font='bold 10px "JetBrains Mono",monospace';
     ctx.fillStyle=userWon?'#ff3c00':'#555';
     ctx.textAlign='center';
@@ -616,7 +605,7 @@
     ctx.textAlign='left';
   }
 
-  // ─── REWARD LOGIC ───
+  // Reward tiers (unchanged behavior; just always renders something)
   function getReward(diff) {
     if (diff >= 5) return { pct:'50', next:"That's the max tier. Legend." };
     if (diff >= 3) return { pct:'15', next:'Beat by <strong>5+ min</strong> next time for <strong>50% off</strong>' };
@@ -624,23 +613,25 @@
     return null;
   }
 
-  function rcode() { return 'BTF-'+Math.random().toString(36).substr(2,4).toUpperCase()+'-'+Math.random().toString(36).substr(2,4).toUpperCase(); }
+  function rcode() {
+    const a = Math.random().toString(36).slice(2,6).toUpperCase();
+    const b = Math.random().toString(36).slice(2,6).toUpperCase();
+    return `BTF-${a}-${b}`;
+  }
 
-  // ─── REVEAL SEQUENCE ───
   function runReveal(userWon, fleetMins, yourMins) {
-    clearInterval(timerInterval);
+    lastUserWon = userWon;
+    stopTimer();
+
     const diff = fleetMins - yourMins;
 
-    // switch screens
     document.getElementById('screen-drive').classList.remove('active');
     document.getElementById('screen-reveal').classList.add('active');
 
-    // reset all steps
     ['step-map','step-time','step-reward','step-lb'].forEach(id => {
       document.getElementById(id).classList.remove('show');
     });
 
-    // update badge
     const badge = document.getElementById('result-badge');
     if (userWon) {
       badge.style.cssText='background:var(--green-dim);border:1px solid var(--green-border);color:var(--green);display:flex;align-items:center;gap:5px;font-family:JetBrains Mono,monospace;font-size:9px;letter-spacing:1.5px;padding:4px 9px;border-radius:2px;';
@@ -650,31 +641,33 @@
       badge.innerHTML='<div style="width:5px;height:5px;background:var(--red);border-radius:50%;animation:blink 1.6s ease-in-out infinite"></div>FLEET WINS';
     }
 
-    // title
     const title = document.getElementById('reveal-title');
-    if (userWon) title.innerHTML = 'You <span class="green">beat</span> the fleet';
-    else title.innerHTML = 'Fleet <span class="red">wins</span> this one';
+    title.innerHTML = userWon
+      ? 'You <span class="green">beat</span> the fleet'
+      : 'Fleet <span class="red">wins</span> this one';
 
-    // time cards
+    // Reset any inline style leaks BEFORE applying state
+    const yourTimeEl = document.getElementById('your-time');
+    yourTimeEl.style.color = '';
+
     document.getElementById('fleet-time').innerHTML = fleetMins+'<span class="u">min</span>';
-    document.getElementById('your-time').innerHTML = yourMins+'<span class="u">min</span>';
+    yourTimeEl.innerHTML = yourMins+'<span class="u">min</span>';
 
     if (userWon) {
       document.getElementById('you-card').className = 'split-card winner';
-      document.getElementById('your-time').className = 'split-time winner-time';
+      yourTimeEl.className = 'split-time winner-time';
       document.getElementById('fleet-card').className = 'split-card';
       document.getElementById('delta-val').textContent = '−'+diff+' min';
       document.getElementById('delta-val').className = 'delta-val';
     } else {
       document.getElementById('fleet-card').className = 'split-card winner';
       document.getElementById('you-card').className = 'split-card';
-      document.getElementById('your-time').className = 'split-time';
-      document.getElementById('your-time').style.color='var(--text)';
+      yourTimeEl.className = 'split-time';
+      yourTimeEl.style.color='var(--text)';
       document.getElementById('delta-val').textContent = '+'+Math.abs(diff)+' min behind';
       document.getElementById('delta-val').className = 'delta-val neg';
     }
 
-    // reward content
     const rWrap = document.getElementById('reward-wrap');
     if (userWon) {
       const r = getReward(diff);
@@ -688,22 +681,25 @@
             <div class="r-expires">Applied to your prime account · expires in 30 days</div>
             <div class="r-next">${r.next}</div>
           </div>`;
+      } else {
+        rWrap.innerHTML = `
+          <div class="no-reward-card">
+            <div class="no-reward-title">Nice run</div>
+            <div class="no-reward-sub">You won, but didn’t hit a reward tier.<br/><strong>Beat the fleet by 1+ minute</strong> to unlock credit.</div>
+          </div>`;
       }
     } else {
       rWrap.innerHTML = `
         <div class="no-reward-card">
           <div class="no-reward-title">Fleet wins this one</div>
-          <div class="no-reward-sub">The fleet route was confirmed optimal on this corridor.<br/><strong>Your drive still helped validate the model.</strong></div>
+          <div class="no-reward-sub">Baseline route held up on this corridor.<br/><strong>Your drive still helped validate the model.</strong></div>
         </div>`;
     }
 
-    // leaderboard your time
     document.getElementById('lb-your-time').textContent = userWon ? '+'+diff+' min' : '—';
 
-    // draw map
     setTimeout(()=>drawResultMap(userWon), 100);
 
-    // staggered step reveals
     setTimeout(()=>document.getElementById('step-map').classList.add('show'), 200);
     setTimeout(()=>document.getElementById('step-time').classList.add('show'), 900);
     setTimeout(()=>document.getElementById('step-reward').classList.add('show'), 1600);
@@ -714,11 +710,16 @@
   function endDriveLoss() { runReveal(false, 8, 11); }
 
   function resetDemo() {
-    timerSecs = 134;
     document.getElementById('screen-reveal').classList.remove('active');
     document.getElementById('screen-drive').classList.add('active');
     startTimer();
   }
+
+  // Redraw canvas on resize/orientation change while reveal is active
+  window.addEventListener('resize', () => {
+    const revealActive = document.getElementById('screen-reveal').classList.contains('active');
+    if (revealActive) drawResultMap(lastUserWon);
+  });
 </script>
 </body>
 </html>
