@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Beat the Fleet — comma</title>
+  <title>Alternate Corridor — Rider Engagement Demo</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
   <style>
     :root {
@@ -413,11 +413,11 @@
   </style>
 </head>
 <body>
-  <main aria-label="Beat the Fleet demo">
+  <main aria-label="Rider Engagement demo">
     <div id="screen-drive" class="screen active" aria-label="Drive simulation screen">
       <div class="header">
-        <div class="logo"><span class="cm">,</span>comma<span class="slash">/</span><span class="sub">beat the fleet</span></div>
-        <div class="live-badge"><div class="pulse"></div>OPENPILOT</div>
+        <div class="logo"><span class="cm">◈</span>RideOps<span class="slash">/</span><span class="sub">corridor test</span></div>
+        <div class="live-badge"><div class="pulse"></div>AUTONOMY ACTIVE</div>
       </div>
 
       <div class="openpilot-ui">
@@ -440,12 +440,12 @@
 
             <div class="deviation-pill" id="dev-pill" aria-live="polite">
               <div class="dev-dot"></div>
-              <div class="dev-text">tracking deviation</div>
+              <div class="dev-text">alternate corridor test active</div>
               <div class="dev-timer" id="dev-timer">00:00</div>
             </div>
 
             <div class="hud-status">
-              <div class="op-label">OPENPILOT</div>
+              <div class="op-label">AUTONOMY ACTIVE</div>
               <div class="op-status">engaged</div>
             </div>
           </div>
@@ -464,7 +464,7 @@
       </div>
 
       <div class="drive-cta">
-        <div class="drive-note">// deviation active · fleet baseline still running in background</div>
+        <div class="drive-note">// alternate corridor test active · baseline still running in background</div>
         <button id="end-drive-btn" class="btn-primary" aria-label="End drive and see results">End drive · see results</button>
         <button id="simulate-loss-btn" class="btn-ghost" aria-label="Simulate fleet winning">Simulate fleet wins →</button>
       </div>
@@ -472,7 +472,7 @@
 
     <div id="screen-reveal" class="screen" aria-label="Results screen">
       <div class="header">
-        <div class="logo"><span class="cm">,</span>comma<span class="slash">/</span><span class="sub">beat the fleet</span></div>
+        <div class="logo"><span class="cm">◈</span>RideOps<span class="slash">/</span><span class="sub">corridor test</span></div>
         <div class="live-badge" id="result-badge" style="background:var(--green-dim);border-color:var(--green-border);color:var(--green)"><div class="pulse"></div>YOU WIN</div>
       </div>
 
@@ -493,16 +493,16 @@
 
       <div class="reveal-step" id="step-map">
         <div class="reveal-header section">
-          <div class="reveal-eyebrow">Your drive vs the fleet</div>
-          <h1 class="reveal-title" id="reveal-title">You <span class="green">beat</span> the fleet</h1>
+          <div class="reveal-eyebrow">Your corridor vs the baseline</div>
+          <h1 class="reveal-title" id="reveal-title">Alternate corridor <span class="green">outperformed</span> baseline</h1>
         </div>
         <div class="result-map-wrap">
           <div class="result-map">
             <canvas id="result-canvas"></canvas>
           </div>
           <div class="route-legend">
-            <div class="legend-item"><div class="legend-dot fleet"></div>Fleet route</div>
-            <div class="legend-item"><div class="legend-dot you"></div>Your route</div>
+            <div class="legend-item"><div class="legend-dot fleet"></div>Baseline route</div>
+            <div class="legend-item"><div class="legend-dot you"></div>Alternate corridor</div>
           </div>
         </div>
       </div>
@@ -512,12 +512,12 @@
           <div class="eyebrow" style="margin-bottom:12px">Time comparison</div>
           <div class="split-cards">
             <div class="split-card" id="fleet-card">
-              <div class="split-label fleet">Fleet AI</div>
+              <div class="split-label fleet">Baseline AI</div>
               <div class="split-time" id="fleet-time">11<span class="u">min</span></div>
               <div class="split-sub" id="fleet-sub">baseline route</div>
             </div>
             <div class="split-card winner" id="you-card">
-              <div class="split-label you">You</div>
+              <div class="split-label you">Alternate</div>
               <div class="split-time winner-time" id="your-time">8<span class="u">min</span></div>
               <div class="split-sub" id="your-sub">via Folsom → 4th</div>
             </div>
@@ -590,6 +590,7 @@
 
       <div class="reveal-cta">
         <button id="back-to-drive-btn" class="btn-primary" aria-label="Back to drive demo">← Back to drive demo</button>
+        <p style="margin-top:12px;font-size:10px;color:var(--muted);text-align:center;font-family:'JetBrains Mono',monospace;letter-spacing:0.5px;">UI concept demo — not connected to any fleet.</p>
       </div>
     </div>
   </main>
@@ -896,8 +897,8 @@
 
         if (els.revealTitle) {
           els.revealTitle.innerHTML = userWon
-            ? 'You <span class="green">beat</span> the fleet'
-            : 'Fleet <span class="red">wins</span> this one';
+            ? 'Alternate corridor <span class="green">outperformed</span> baseline'
+            : 'Baseline <span class="red">wins</span> this one';
         }
 
         if (els.yourTime) els.yourTime.style.color = '';
@@ -931,11 +932,11 @@
             els.rewardWrap.innerHTML = r
               ? `
                 <div class="reward-card pop">
-                  <div class="r-eyebrow">comma prime credit unlocked</div>
+                  <div class="r-eyebrow">Ride Credit unlocked</div>
                   <div class="r-amount">${r.pct}<span class="r-pct">%</span></div>
                   <div class="r-off">OFF YOUR NEXT MONTH</div>
                   <div class="r-code">${rcode()}</div>
-                  <div class="r-expires">Applied to your prime account · expires in 30 days</div>
+                  <div class="r-expires">Applied to your ride account · expires in 30 days</div>
                   <div class="r-next">${r.next}</div>
                 </div>`
               : `
@@ -946,7 +947,7 @@
           } else {
             els.rewardWrap.innerHTML = `
               <div class="no-reward-card">
-                <div class="no-reward-title">Fleet wins this one</div>
+                <div class="no-reward-title">Baseline wins this one</div>
                 <div class="no-reward-sub">Baseline route held up on this corridor.<br /><strong>Your drive still helped validate the model.</strong></div>
               </div>`;
           }
@@ -981,7 +982,7 @@
           els.resultBadge.innerHTML = '<div class="pulse"></div>YOU WIN';
         }
 
-        if (els.revealTitle) els.revealTitle.innerHTML = 'You <span class="green">beat</span> the fleet';
+        if (els.revealTitle) els.revealTitle.innerHTML = 'Alternate corridor <span class="green">outperformed</span> baseline';
         if (els.fleetTime) els.fleetTime.innerHTML = '11<span class="u">min</span>';
         if (els.yourTime) {
           els.yourTime.innerHTML = '8<span class="u">min</span>';
