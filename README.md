@@ -2,7 +2,7 @@
 
 > *The AI thinks it knows the fastest way. Prove it wrong. Get paid.*
 
-A product concept and interactive mockup for gamifying autonomous vehicle rides — built with the comma 3X in mind.
+A product concept and interactive mockup for gamifying autonomous vehicle rides — built with the comma four in mind.
 
 ---
 
