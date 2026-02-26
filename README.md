@@ -1,64 +1,71 @@
 # Beat the Fleet 🏁
 
-> *The AI thinks it knows the fastest way. Prove it wrong. Get paid.*
+> *The model thinks it knows the best way. Prove there’s a better one. Earn credit.*
 
-A product concept and interactive mockup for gamifying openpilot — built with the comma four in mind.
+A product concept + interactive UI mock for a “fleet baseline vs your actual drive” post-ride reveal.
 
----
-
-## The Problem Nobody's Talking About
-
-openpilot knows the statistically optimal route. But the people driving with it every day know things the model doesn't: the side street that clears by 9am, the light that runs long on Tuesdays, the cut-through that shaves four minutes off a commute nobody has ever logged.
-
-That knowledge gets used once, then disappears.
-
-**Beat the Fleet puts it to work.**
+> This repo is **a UI concept demo** (no real telemetry, routing, or openpilot integration).
 
 ---
 
-## How It Works
+## What It Is
 
-No setup. No pre-selecting a route. You just drive.
+Drivers build local knowledge: which turn is faster **at this time of day**, which light is brutal on Tuesdays, which connector street is a cheat code.
 
-When you deviate from openpilot's suggested path, the system notices. It silently runs both timelines: your actual route and the fleet's recommended route, and compares them at the end of your drive.
+That knowledge gets used once… then disappears.
 
-Beat the fleet by a minute or more and you earn credit off your comma prime subscription. The bigger the gap, the bigger the cut.
+**Beat the Fleet is a loop-closer UI:**
+- detect that the driver took a different path than a baseline route
+- compare outcomes post-ride
+- surface a scorecard (and optionally a reward)
 
-| Beat the fleet by | Reward |
+---
+
+## Important Notes (Reality + Safety)
+
+- **openpilot does not choose navigation routes** in its typical configuration. This concept assumes a “baseline route” provided by a navigation source (phone nav / maps / fleet aggregate), not by openpilot itself.
+- Any real implementation must be **safety-gated**:
+  - no rewards for speeding or unsafe maneuvers
+  - reward eligibility only when driving behavior stays within safe thresholds (speed compliance, no harsh braking, etc.)
+
+This repo does not implement any of that — it’s just the UI mock.
+
+---
+
+## Reward Tiers (demo logic)
+
+| Beat baseline by | Reward |
 |---|---|
 | Under 1 min | No reward — close though |
-| 1 – 2 min | **10% off** next prime month |
-| 3 – 4 min | **15% off** next prime month |
-| 5+ min | **50% off** next prime month |
+| 1 – 2 min | **10% off** next month |
+| 3 – 4 min | **15% off** next month |
+| 5+ min | **50% off** next month |
 
 ---
 
-## Why This Is Actually Smart
+## The Mock
 
-**For drivers:** you're not just supervising anymore. Every time you take your own turn, there's a scorecard waiting at the end. Local knowledge becomes something worth keeping track of.
-
-**For the model:** every deviation is already being logged. Beat the Fleet just closes the loop by surfacing that comparison back to the driver with a reward attached. Shortcuts that win get absorbed into training data. Routes that lose confirm the AI was right. Either way, comma gets human-verified route data from people who are motivated to try. The cost of a 15% prime credit is nothing compared to what a real local shortcut is worth across the fleet.
-
-**For growth:** drivers will talk about it. They'll try routes they've been curious about. They'll check the leaderboard. That's engagement and retention that compounds.
-
----
-
-## The Mockup
-
-`beat-the-fleet.html` — open it in any browser, no dependencies, no build step.
+`index.html` — open it in any browser (no dependencies, no build step).
 
 Simulates two states:
+- **Active drive:** HUD mock with a subtle “tracking deviation” pill
+- **Post-ride reveal:** map overlay → time split → reward card → leaderboard
 
-- **Active drive:** openpilot HUD with a subtle deviation tracking indicator running in the corner
-- **Post-ride reveal:** sequential scorecard that shows your route vs the fleet route on a live map, the time split, and the reward unlock if you won
+---
 
-Also includes an all-time local legends leaderboard and a fleet-wide stats ticker.
+## Live Demo (GitHub Pages)
+
+Once GitHub Pages is enabled, your demo will be available at:
+
+- https://goflypost.github.io/beat-the-fleet/
+
+(Use the included workflow under `.github/workflows/pages.yml`.)
 
 ---
 
 ## Status
 
-Concept and working prototype. Not affiliated with comma.ai — just someone who thinks this should exist.
+Concept + working UI prototype. Not affiliated with comma.ai.
 
 ---
 
